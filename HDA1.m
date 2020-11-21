@@ -25,10 +25,10 @@ etc).
 assumptions:
 -want entire lander footprint within image since there may be unknown
 hazards right outside image
+-edges right outside the image should be treated as a 'hazard' when
+computing distances since there may be a hazard there
 
 questions/future improvements:
--should the edges right outside the image be treated as a 'hazard' when
-computing distances since there may be a hazard there?
 -add considerations for choosing the site close to a planned/desired site?
 -add consideration for choosing the site due to fuel constraints?
 %}

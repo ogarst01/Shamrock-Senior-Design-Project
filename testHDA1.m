@@ -17,7 +17,7 @@ close all
 n = 1024; %pixels
 m = 1024; %pixels
 minHazSize = 5; %square pixels
-maxHazSize = 100; %square pixels
+maxHazSize = 75; %square pixels
 numHaz = 30;
 landerFootprint = 10; %square pixels
 
