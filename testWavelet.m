@@ -22,7 +22,15 @@ Bennu_smooth = smooth(Bennu);
 figure
 imshow(Bennu_smooth)
 
-%TODO: wavelet transform
+%Try Canny transform
+Bennu_canny = edge(Bennu_smooth, 'canny');
+figure
+imshow(Bennu_canny)
+
+%Try multiscale wavelet transform
+Bennu_mw = multiscaleWavelet(Bennu_smooth);
+figure
+imshow(Bennu_mw)
 
 
 
