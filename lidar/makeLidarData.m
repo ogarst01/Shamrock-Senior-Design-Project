@@ -1,7 +1,4 @@
-
-clear
-close all
-
+function img = makeLidarData(percent, imName)
 % makes test points in a zig zag pattern, saving time & velocity
 % at each point:
 
@@ -16,37 +13,47 @@ close all
 
 % assumptions about the set:
 % == 1 meter by 3 meters
-
-samplesPerSec = 40;
-widthRoom = 1; % m
-lengtRoom = 1; % m
-vel = 0.25;    % m/s
-samplesPerSec = 40; 
-
-sampPerSweep = samplesPerSec*widthRoom/vel;
-
-numSweeps = 30;
+% samplesPerSec = 40;
+% widthRoom = 1; % m
+% lengtRoom = 1; % m
+% vel = 0.25;    % m/s
+% samplesPerSec = 40; 
+% 
+% sampPerSweep = samplesPerSec*widthRoom/vel;
+% 
+% numSweeps = 30;
 % use image of asteroid for real data (use image brightness for example):
 
 % use sample image to make lidar points 
-im = imread('imgBennu.jpg');
+if(imName == 'BennuLargestBoulder')
+    cd testImages;
+    im = imread('BennuLargestBoulder.png');
+    cd ..
+else
+    cd testImages;
+    im = imread('imgBennu.jpg');
+    cd ..
+end
 figure,
 imshow(im)
 dim = size(im); % 468 468 3
 
-widthResolution = 10; % pixels
+W = dim(1)*percent/100;
+L = dim(2)*percent/100;
+
+% widthResolution = 10; % pixels
 
 %%
 % figure,plot3(firstSweep)
 %%
-sweepNum = 1;
+% sweepNum = 1;
+% 
+% maxLocation = numSweeps*widthResolution;
+% 
+% rowsLidar = linspace(1,round(maxLocation),numSweeps);
 
-maxLocation = numSweeps*widthResolution;
-
-rowsLidar = linspace(1,round(maxLocation),numSweeps);
-
-numXsamp = 100;
-numYsamp = 100;
+numXsamp = W;
+numYsamp = L;
 
 for i = 1:numXsamp
     for j = 1:numYsamp
@@ -73,7 +80,7 @@ figure, surf(lidarDownSamp(:,:,1));
 title('downsampled image')
 
 %%
-dim = size(lidarDownSamp)
+dim = size(lidarDownSamp);
 %%
 figure, stem3(lidarDownSamp(:,:,1));
 title('downsampled image')
@@ -97,3 +104,6 @@ title('Cubic Interpolation Over Finer Grid');
 %%
 % show results
 % plot3(lidar)
+
+img = lidarDownSamp(:,:,1);
+end

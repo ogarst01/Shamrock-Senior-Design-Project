@@ -1,0 +1,5 @@
+function result = reduceNoise(img)
+    % uses the median filter function
+    result  = medfilt2(img);
+end
+

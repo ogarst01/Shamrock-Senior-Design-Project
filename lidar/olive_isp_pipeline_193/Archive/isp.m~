@@ -1,0 +1,46 @@
+% to do 
+% - don't use only half of the green values for interp2
+% - save as jpg image
+% - change denoising function from gaussiang to a box function
+
+function img = isp(raw, metadata)
+
+
+% grabs iso values from the .csv data provided
+iso = metadata_value(metadata, 'ISO');
+
+% stores iso value as a number 
+isoVal = str2num(iso);
+
+% inputs a .tif file that increases contrast and outputs a .tif file:
+img = blacklevel(raw);
+    figure(57)
+    imshow(img);
+    title('blacklevelCorrected image');
+    
+% demosaics the inputted .
+img = isp_demosaic(img);
+    figure(2)
+    imshow(img);
+    title('demosaiced image'); 
+img = colorcorrection(img);
+    figure(3)
+    imshow(img);
+    title('color corrected image');
+img = gammaMap(img, isoVal);
+    figure(4)
+    imshow(img);
+    title('gamma mapped')
+%img = sharpen(img);
+img = reduceNoise(img);
+    figure(5)
+    imshow(img);
+    title('lessnoisy')
+
+% returns final image after processing pipeline
+img = img;
+
+% saves image as a png file
+imwrite(img, 'ee193finalImage.png');
+save('FINALDATA');
+
