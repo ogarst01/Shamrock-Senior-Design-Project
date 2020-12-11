@@ -10,7 +10,7 @@ classdef KalmanFilter
         end
         
         methods
-            function Step(obj,u, z)
+            function obj = Step(obj,u, z)
                 % Prediction Step
                 xnext = obj.A * obj.x + obj.B * u;
                 Pnext = (obj.A * obj.P) * transpose(obj.A) + obj.Q;
@@ -18,7 +18,7 @@ classdef KalmanFilter
                 mu = z - obj.H * xnext;
                 sigma = obj.H * Pnext * transpose(obj.H);
                 % Update Step
-                K = sigma * inv(sigma + obj.R);
+                K = sigma/(sigma + obj.R);
                 obj.x = xnext + K * mu;
                 obj.P = Pnext - K * obj.H * Pnext;
             end

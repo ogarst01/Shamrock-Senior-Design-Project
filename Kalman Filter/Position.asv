@@ -21,7 +21,7 @@ classdef Position
                  (T^3/2)*obj.sigp^2,  T^2*obj.sigp^2,       0;
                  0,               0,                1];
             R = obj.siga;
-            P = eye(3);
+            P = zeros(3)
         end
         
         function outputArg = method1(obj,inputArg)
