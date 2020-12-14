@@ -33,16 +33,23 @@ hold off
 % figure 
 % imshow(local)
 
+% Using just the gray scale find the difference between the global map and
+% the local map
 for i = 1:numRows-40
     for j = 1:numCols - 40
         globalSect = bennuMed(i:i+40,j:j+40);
         tempDiff = globalSect - local;
+        % find the sum at every point of the difference between the two
+        % maps
         locationDiff(i,j) = sum(tempDiff, 'all');
         clear globalSect
     end
 end
+% the best match should be the point when the two completely overlap and
+% their difference is zero
 [bestN, bestM] = find(locationDiff == 0);
 
+% plot the results of the gray scale comparison
 figure
 imshow(bennuMed)
 title('Global Map with Gray Scale Image Selection In Yellow')
@@ -53,14 +60,19 @@ for dim = 1:length(bestM)
 end
 hold off
 
+% Use the SSIM (structural similarity index), calculate for the results of
+% the gray scale calculation to account for the case where we have two
+% completelely white or completely black squares
 for i = 1:length(bestN)
     for j = 1:length(bestM)
         globalSSIM = bennuMed(bestN(i):bestN(i)+40,bestM(j):bestM(j)+40);
         [ssimval(i,j),~] = ssim(local,globalSSIM);
     end
 end
+% the ideal match is where the index equals 1, complete match
 [ssimN, ssimM] = find(ssimval == 1);
 
+% plot the results of the SSIM calculation
 figure
 imshow(bennuMed)
 title('Global Map with SSIM Selection In Green')
