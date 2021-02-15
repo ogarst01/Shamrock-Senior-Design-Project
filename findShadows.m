@@ -47,9 +47,45 @@ hold on
 plot(bound_idx(:,2), bound_idx(:,1), '.r')
 hold off
 
-%count pixels within boundaries
+%CCL
+[row, col] = size(image);
+connected = zeros(row, col); %initialize connectivity matrix to size of image
+mark = 1; %mark is initialized, incremented for every detected object
+num_objects = 0;
+infoMat = zeros(10,2); %store info about groups, first col: mark, second col: num pixels in group
+
+for i = 1:row
+    for j = 1:col
+        %detect black objects not part of other group
+        if(image(i,j) == 0 && connected(i,j) == 0)
+            num_objects = num_objects + 1;
+            num_pixels = 1;
+            index = [i,j];
+            connected(index(1), index(2)) = mark;
+            
+            [connected, num_pixels] = findNeighbors(image, connected, index, num_pixels);
+            
+            infoMat(num_objects, 1) = mark;
+            infoMat(num_objects, 2) = num_pixels;
+            mark = mark + 1;
+        end
+    end
+end
 
 %threshold, remove shadows that are too small
+initialSize = round(num_objects / 4); %initialize to 1/4 size
+threshInfoMat = zeros(initialSize, 2);
+threshIndex = 1;
+for k = 1:num_objects
+    if(infoMat(k,2) >= 5)
+        threshInfoMat(threshIndex, :) = infoMat(k, :);
+        threshIndex = threshIndex + 1;
+    end
+end
+threshInfoMat(threshIndex:initialSize, :) = []; %remove extra unused rows
+
+%remove shadows that are too small
+
 
 shadowsInImage = [];
 
