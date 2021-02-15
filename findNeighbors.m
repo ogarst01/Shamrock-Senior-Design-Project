@@ -1,4 +1,29 @@
 function [updatedConnectivity, updatedPixels] = findNeighbors(image, connectivityMat, index, numPixels)
+%{
+Senior Design
+Team Shamrock
+Melissa Rowland
+2/15/21
+
+inputs: 
+image - preprocessed binary image, shadows marked as black pixels
+connectivityMat - matrix that holds marks for pixels part of shadow group
+index - location of pixel to find neighbors for
+numPixels - size of the grouping so far
+
+outputs: 
+updatedConnectivity - updated version of the connectivity matrix that is
+                      marked with this pixel's neighbors
+updatedPixels - size of the grouping after finding this pixel's neighbors
+
+purpose:
+Recursively find the pixels that make up the shadow group and count the 
+size of the group.
+
+questions/future improvements:
+-possibly remove the connectivity matrix and just count the number of
+pixels?
+%}
 
 updatedConnectivity = connectivityMat;
 updatedPixels = numPixels;

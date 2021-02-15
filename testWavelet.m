@@ -40,7 +40,11 @@ imshow(Bennu_mw_smooth)
 %}
 
 %Try finding shadows in multiscale transform image
-Bennu_shadows = findShadows(Bennu_mw);
+threshold = 30; %pixels
+plotBound = true;
+Bennu_shadows = findShadows(Bennu_mw, threshold,true);
+figure
+imshow(Bennu_shadows);
 
 
 
