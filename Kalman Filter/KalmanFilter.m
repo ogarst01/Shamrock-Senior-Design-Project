@@ -10,6 +10,15 @@ classdef KalmanFilter
         end
         
         methods
+            function obj = SetKF(obj,x,A,B,H,P,Q,R)
+                obj.x = x;
+                obj.A = A;
+                obj.B = B;
+                obj.H = H;
+                obj.P = P;
+                obj.Q = Q;
+                obj.R = R;
+            end
             function obj = Step(obj,u, z)
                 % Prediction Step
                 xnext = obj.A * obj.x + obj.B * u;

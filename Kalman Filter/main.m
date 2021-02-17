@@ -1,7 +1,7 @@
 %% Generate IMU Data
 N = 1000;
 Fs = 100;
-Fc = 0.25;
+
 params = gyroparams('RandomWalk',[0.2 0 0.03]);
 
 t = (0:(1/Fs):((N-1)/Fs))';
@@ -32,10 +32,31 @@ legend('x (ground truth)', 'x (gyroscope)')
 
 
 %% Run filter
+clear;
+clc;
 
 filt = KalmanFilter;
 
+pos = Position;
 
+T = 1000;
+pos.delT = 1;
+pos.siga = 0;
+pos.sigp = 0;
+x = [0; 0; 0];
+u = 1;
+z = 0.1;
+kalman = zeros(3,T);
+
+[A,B,H,P,Q,R] = CreateFiltObj(pos,T);
+filt = SetKF(filt,x,A,B,H,P,Q,R);
+
+for i = 1:T
+    kalman(:,i) = filt.x;
+    filt = Step(filt,u,z);
+end
+
+plot3(kalman(1,:),kalman(2,:),kalman(3,:))
 
 
 
