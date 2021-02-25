@@ -1,29 +1,28 @@
 function hazardMap = mapRocks(shadowBoundaries, rockDiameter, sunDirection, mapSize)
 %todo add axis line
-%todo check if 0 or 1 means hazard
+%1 means hazard
 %assumes shadow edge is midpoint of ellipse/square
 hazardMap = zeros(mapSize);
-hazardMap(1:mapSize(1), 1:mapSize(2)) = 256;
+rockRad = round(rockDiameter / 2);
 
+%roughly find center of shadow
+if sunDirection == 'south'
+    midPointX = mean(shadowBoundaries(:,2));
+    midPointX = round(midPointX);
+else
+    %todo add other directions
+end
 
 if sunDirection == 'south'
-    [midPointY, midIndex] = min(shadowBoundaries(:, 2));
-    midPointX = shadowBoundaries(midIndex);
-    rockRad = rockDiameter / 2;
+    startPointY = max(shadowBoundaries(:, 1));
+    endPointY = startPointY + 2 * rockRad;
     
-    startPointX = midPointX - rockRad;
-    endPointX = midPointX + rockRad;
-    startPointY = midPointY - rockRad;
-    endPointY = midPointY + rockRad;
-    hazardMap(startPointX:endPointX, startPointY:endPointY) = 0;
 else
     %todo add other directions
 end
 
 startPointX = midPointX - rockRad;
 endPointX = midPointX + rockRad;
-startPointY = midPointY - rockRad;
-endPointY = midPointY + rockRad;
-hazardMap(startPointX:endPointX, startPointY:endPointY) = 0;
+hazardMap(startPointX:endPointX, startPointY:endPointY) = 1;
 
 end

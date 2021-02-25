@@ -45,10 +45,10 @@ for i = 1:length(neighbors)
     %check that index is within bounds
     if neighbors(i,1) <= row && neighbors(i,1) >= 1 && neighbors(i,2) <= col && neighbors(i,2) >= 1
         %check if neighbor is black
-        if(image(neighbors(i,1), neighbors(i,2)) < 225 && updatedConnectivity(neighbors(i,1), neighbors(i,2)) ~= mark)
+        if(image(neighbors(i,1), neighbors(i,2)) == 0 && updatedConnectivity(neighbors(i,1), neighbors(i,2)) ~= mark)
             %update connectivityMat
             updatedConnectivity(neighbors(i,1), neighbors(i,2)) = mark;
-            updatedPixels = numPixels + 1;
+            updatedPixels = updatedPixels + 1;
 
             %recurse over this pixel's neighbors
             [updatedConnectivity, updatedPixels] = findNeighbors(image, updatedConnectivity, neighbors(i,:), updatedPixels);

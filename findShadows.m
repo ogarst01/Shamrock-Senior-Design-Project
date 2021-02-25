@@ -35,7 +35,7 @@ infoMat = zeros(10,4); %store info about groups,
 for i = 1:row
     for j = 1:col
         %detect black objects that are not already part of a group
-        if(image(i,j) < 225 && connected(i,j) == 0)
+        if(image(i,j) == 0 && connected(i,j) == 0)
             num_objects = num_objects + 1;
             num_pixels = 1;
             index = [i,j];
