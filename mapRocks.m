@@ -61,6 +61,7 @@ else
 end
 
 %fill in hazard map
-hazardMap(startPointX:endPointX, startPointY:endPointY) = 1;
+%really not sure why the Y needs to go first in the index
+hazardMap(startPointY:endPointY, startPointX:endPointX) = 1;
 
 end

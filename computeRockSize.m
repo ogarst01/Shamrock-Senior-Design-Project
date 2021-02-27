@@ -19,13 +19,10 @@ of the sun.
 
 current model:
 -assuming rock is semispherical
--assuming shadow length is base of right triangle with height of rock as 
-the height, sun vertical angle is the angle opposite the height
+-for trig derivation, see trig_derivation.jpg
 
 questions/future improvements:
 -is this calculation valid/accurate?
--take into account that the shadow goes from the edge of the object not the
-center
 
 %}
 
@@ -33,6 +30,6 @@ center
 sunAngle = sunVertAngle * pi / 180;
 
 %simple calculation
-rockHeight = tan(sunAngle) * shadowSize;
+rockHeight = tan(sunAngle) * shadowSize / (1 - tan(sunAngle) / 2);
 rockDiameter = 2 * rockHeight;
 end
