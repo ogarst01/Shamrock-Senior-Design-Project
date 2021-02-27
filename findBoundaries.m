@@ -1,4 +1,4 @@
-function boundaryPixels = findBoundaries(image)
+function boundaryPixels = findBoundaries(image, plotOutput)
 %{
 Senior Design
 Team Shamrock
@@ -7,6 +7,8 @@ Melissa Rowland
 
 inputs: 
 image - preprocessed binary image, shadows marked as black pixels
+plotOutput - bool, if true make a plot where the boundary of the object is
+             shown in red
 
 outputs: 
 boundaryPixels - matrix holding indices of pixels that are shadow
@@ -20,34 +22,36 @@ questions/future improvements:
 -N/A
 %}
 
-    %find boundaries - black pixels next to white
-    [row, col] = size(image);
-    bound_idx = [];
-    for i = 1:row
-        for j = 1:col
-            %check black pixels
-            if(image(i,j) == 0)
-                [bound_row, bound_col] = size(bound_idx);
-                %check adjacent pixels
-                %if one is white, mark this as a boundary (red)
-                if(i < row && image(i+1,j) == 256)
-                    bound_idx(bound_row+1, :) = [i, j];
-                elseif (i > 1 && image(i-1,j) == 256)
-                    bound_idx(bound_row+1, :) = [i, j];
-                elseif (j < col && image(i, j+1) == 256)
-                    bound_idx(bound_row+1, :) = [i, j];
-                elseif (j > 1 && image(i, j-1) == 256)
-                    bound_idx(bound_row+1, :) = [i, j];
-                end
+%find boundaries - black pixels next to white
+[row, col] = size(image);
+bound_idx = [];
+for i = 1:row
+    for j = 1:col
+        %check black pixels
+        if(image(i,j) == 0)
+            [bound_row, bound_col] = size(bound_idx);
+            %check adjacent pixels
+            %if one is white, mark this as a boundary (red)
+            if(i < row && image(i+1,j) == 256)
+                bound_idx(bound_row+1, :) = [i, j];
+            elseif (i > 1 && image(i-1,j) == 256)
+                bound_idx(bound_row+1, :) = [i, j];
+            elseif (j < col && image(i, j+1) == 256)
+                bound_idx(bound_row+1, :) = [i, j];
+            elseif (j > 1 && image(i, j-1) == 256)
+                bound_idx(bound_row+1, :) = [i, j];
             end
         end
     end
+end
 
+if plotOutput
     figure
     imshow(image)
     hold on
     plot(bound_idx(:,2), bound_idx(:,1), '.r', 'MarkerSize', 3)
     hold off
-    
-    boundaryPixels = bound_idx;
+end
+
+boundaryPixels = bound_idx;
 end

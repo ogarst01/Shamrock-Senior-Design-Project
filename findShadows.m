@@ -76,8 +76,8 @@ for l = 1:threshSize
 end
 
 if(plotBoundaries)
-    boundPixelsOrig = findBoundaries(image);
-    boundPixelsFinal = findBoundaries(shadowImage);
+    boundPixelsOrig = findBoundaries(image, true);
+    boundPixelsFinal = findBoundaries(shadowImage, true);
 end
 
 end
