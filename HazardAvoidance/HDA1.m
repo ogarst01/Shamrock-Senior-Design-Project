@@ -1,4 +1,4 @@
-function [xCoord, yCoord, distanceMap] = HDA1(hazardMap, landerFoot)
+function [xCoord, yCoord, distanceMap] = HDA1(hazardMap, params)
 %[xCoord, yCoord, distanceMap] = HDA1(hazardMap, landerFoot)
 %{
 Senior Design
@@ -32,6 +32,8 @@ questions/future improvements:
 -add considerations for choosing the site close to a planned/desired site?
 -add consideration for choosing the site due to fuel constraints?
 %}
+
+landerFoot = params.landerFootprint;
 
 %Compute distance map
 distanceMap = DTNH(hazardMap);
