@@ -1,4 +1,4 @@
-function hazardMap = shadowBasedDetectionWrapper(image)
+function hazardMap = shadowBasedDetectionWrapper(image, params)
 %{
 Senior Design
 Team Shamrock
@@ -7,6 +7,7 @@ Melissa Rowland
 
 inputs: 
 image - image of asteroid surface
+params - struct containing parameters about simulation
 
 outputs: 
 hazardMap - binary hazard map with hazard locations marked as '1', safe
@@ -34,9 +35,9 @@ Future improvements:
 smooth_sigma = 2;
 shadow_size_threshold = 500;
 %In future, pass in the following from param struct in main
-sun_vertical_angle = 20; %degrees
-sun_dir = 'south';
-height_threshold = 15; %pixels - TODO convert to m!!
+sun_vertical_angle = params.sunVerticalAngle;
+sun_dir = params.sunDirection;
+height_threshold = params.hazardHeightThreshold; %pixels - TODO convert to m!!
 
 %Image pre-processing: make grayscale, smooth
 im_gray = rgb2gray(image);

@@ -13,15 +13,27 @@ Questions/Ideas/Future Improvements:
 of separate sections?
 %}
 
-%TODO: Set up params struct
+%% Add paths to source code for each feature
+
+addpath('ShadowBasedHazardDetection')
+
+
+%% Set up params struct
+
+params.sunVerticalAngle = 20;
+params.sunDirection = 'south';
+params.hazardHeightThreshold = 15; %pixels (TODO convert to m)
 
 %% Image Processing
 %TODO: read in series of images and perform the following activities in a
 %loop over them
 
 %Read in image
+image = imread('blender_images/1sphere_sun_20.png');
+image = image(1:512,224:735, :); %crop image for now
 
 %Perform shadow detection
+shadow_hazard_map = shadowBasedDetectionWrapper(image, params);
 
 %Perform computer vision
 
