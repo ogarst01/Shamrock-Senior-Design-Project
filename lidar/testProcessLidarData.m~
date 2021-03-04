@@ -88,78 +88,19 @@ vq = griddata(x,y,z,xq,yq);
 mesh(xq,yq,vq)
 hold on
 plot3(x,y,z,'o')
-title('interpolated lidar plot')
-
-%%
 
 figure,
 plot3(x,y,gradient(z))
-title('gradient plot')
 
-figure,
-plot3(x,y,gradient(gradient(z)))
-title('gradient of gradient plot')
-
-% for now, just grab values over a known threshold as groun as a hazard... 
-gradZ = gradient(z);
 gradThresh = 0.1;
 
-% grab the x highest values of the total dataset: 
-
-% find the avrg. value in the lidar dataset height. 
-avrgZ = mean(z);
-
-% also make a histogram of height data to better visualize:
-nbins = 20;
-titleWord = sprintf('histogram of heights of rocks, with mean values of %g',avrgZ)
-
-figure,
-histogram(z,nbins)
-title(titleWord)
-
-% first - anything in the top 50% assume that it is a hazard
-gradZ((gradZ) >= 0.75*avrgZ)=1;
-
-gradZ((gradZ) < 1)=0;
-
-% these values are safe. 
-% 
-% gradZ(abs(gradZ)<= gradThresh)=0;
-% 
-% gradZ(abs(gradZ) > gradThresh)=1;
-
-[xq,yq] = meshgrid(-10:.2:10, -10:.2:10);
-vq = griddata(x,y,gradZ,xq,yq);
-
-figure,
-mesh(xq,yq,vq)
-hold on
-plot3(x,y,gradZ,'o')
-title('hazard map')
-
-%%
-% figure,
-% scatter3(x,y,gradZ)
-% title('hazard map')
-%%
-% img = [x,y,gradZ]
-% figure,
-% imshow(img)
-%%
-hazardMap = [];
-
 % make the hazard map based on high sloped areas and what's in between
-for i = 1:length(testIMUdata_x)
-    for j = 1:length(testIMUdata_y)
-        if(gradient(z) <= gradThresh)
-            % if the slpe is pretty unchanging, then make the color = 
-            hazardMap(i,j) = 0;
-        else
-            hazardMap(i,j) = 1;
-        end
+for i = 1:length(array)
+    if(gradient(z) <= gradThresh)
+        testIMUdata_x
+        
     end
 end
-% %%
-% 
-% figure,
-% imagesc(gradZ)
+
+% axis([0 2 0 2 0 2])
+% axis([1.5 2])
