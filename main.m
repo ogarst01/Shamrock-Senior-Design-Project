@@ -21,7 +21,7 @@ addpath('ShadowBasedHazardDetection')
 %% Set up params struct
 
 params.sunVerticalAngle = 20;
-params.sunDirection = 'south';
+params.sunDirection = 'top';
 params.hazardHeightThreshold = 15; %pixels (TODO convert to m)
 
 %% Image Processing
@@ -31,6 +31,7 @@ params.hazardHeightThreshold = 15; %pixels (TODO convert to m)
 %Read in image
 image = imread('blender_images/1sphere_sun_20.png');
 image = image(1:512,224:735, :); %crop image for now
+image = imrotate(image, 180); %flip image around for testing
 
 %Perform shadow detection
 shadow_hazard_map = shadowBasedDetectionWrapper(image, params);
