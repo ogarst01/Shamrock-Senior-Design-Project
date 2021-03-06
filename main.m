@@ -13,9 +13,12 @@ Questions/Ideas/Future Improvements:
 of separate sections?
 %}
 
+clear all
+close all
+
 %% Add paths to source code for each feature
 
-addpath('ShadowBasedHazardDetection')
+addpath('ShadowBasedHazardDetection', 'HazardAvoidance')
 
 
 %% Set up params struct
@@ -23,6 +26,7 @@ addpath('ShadowBasedHazardDetection')
 params.sunVerticalAngle = 20;
 params.sunDirection = 'top';
 params.hazardHeightThreshold = 15; %pixels (TODO convert to m)
+params.landerFootprint = 10; %pixels (TODO convert to m?)
 
 %% Image Processing
 %TODO: read in series of images and perform the following activities in a
@@ -30,11 +34,14 @@ params.hazardHeightThreshold = 15; %pixels (TODO convert to m)
 
 %Read in image
 image = imread('blender_images/1sphere_sun_20.png');
+%resize & crop image for now
+test_image = imresize(test_image, 1/2);
 image = image(1:512,224:735, :); %crop image for now
 image = imrotate(image, 180); %flip image around for testing
 
+
 %Perform shadow detection
-shadow_hazard_map = shadowBasedDetectionWrapper(image, params);
+shadow_hazard_map = shadowBasedDetectionWrapper(test_image, params);
 
 %Perform computer vision
 
@@ -48,9 +55,21 @@ shadow_hazard_map = shadowBasedDetectionWrapper(image, params);
 
 %% Hazard Detection and Avoidance
 
-%Combine hazard maps
+%TODO: Combine hazard maps w/ weighting function
+hazard_map = shadow_hazard_map;
+
+%Run HDA algorithm
+[xLand, yLand, distanceMap] = HDA1(hazard_map, params);
 
 %% Format outputs
+
+%Plot DTNH map with marker for chosen site
+%TODO make a separate function
+figure
+image(distanceMap)
+hold on
+plot(xLand, yLand, 'r+', 'MarkerSize', 10, 'LineWidth', 2)
+title('DTNH Map with Chosen Site')
 
 
 
