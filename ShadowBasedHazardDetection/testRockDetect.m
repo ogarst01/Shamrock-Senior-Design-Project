@@ -25,7 +25,7 @@ clear all
 close all
 
 %Read in image, convert to grayscale
-im_orig = imread('blender_images/1sphere_sun_20.png');
+im_orig = imread('../blender_images/1sphere_sun_20.png');
 im_gray = rgb2gray(im_orig);
 %Optional resizing to 512 x 512
 im_gray = imresize(im_gray, 1/2);
