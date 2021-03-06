@@ -41,23 +41,39 @@ hazardMap = zeros(mapSize);
 rockRad = round(rockDiameter / 2);
 
 %roughly find center of shadow in X
-if sunDirection == 'south'
+if strcmp(sunDirection, 'top') || strcmp(sunDirection == 'bottom')
     midPointX = mean(shadowBoundaries(:,2));
     midPointX = round(midPointX);
     startPointX = midPointX - rockRad;
     endPointX = midPointX + rockRad;
+elseif strcmp(sunDirection, 'left')
+elseif strcmp(sunDirection, 'right')
 else
-    %todo add other directions
+    %todo print error statement
 end
 
 %find where the rock starts in Y
-if sunDirection == 'south'
+if strcmp(sunDirection, 'bottom')
     %assume bottom of shadow is start of rock
     startPointY = max(shadowBoundaries(:, 1));
     endPointY = startPointY + 2 * rockRad;
-    
-else
+elseif strcmp(sunDirection,'top')
+    %assume top of shadow is start of rock
+    endPointY = min(shadowBoundaries(:, 1));
+    startPointY = endPointY - 2 * rockRad;
+elseif strcmp(sunDirection, 'left') || strcmp(sunDirection, 'right')
     %todo add other directions
+end
+
+%change start/end points to edge if they are outside image
+if endPointX > mapSize(1)
+    endPointX = mapSize(1);
+elseif startPointX < 1
+    startPointX = 1;
+elseif endPointY > mapSize(2)
+    endPointY = mapSize(2);
+elseif startPointY < 1
+    startPointY = 1;
 end
 
 %fill in hazard map

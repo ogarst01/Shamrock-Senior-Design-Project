@@ -24,7 +24,7 @@ addpath('ShadowBasedHazardDetection', 'HazardAvoidance')
 %% Set up params struct
 
 params.sunVerticalAngle = 20;
-params.sunDirection = 'south';
+params.sunDirection = 'top';
 params.hazardHeightThreshold = 15; %pixels (TODO convert to m)
 params.landerFootprint = 10; %pixels (TODO convert to m?)
 
@@ -33,10 +33,12 @@ params.landerFootprint = 10; %pixels (TODO convert to m?)
 %loop over them
 
 %Read in image
-test_image = imread('blender_images/1sphere_sun_20.png');
+image = imread('blender_images/1sphere_sun_20.png');
 %resize & crop image for now
 test_image = imresize(test_image, 1/2);
-test_image = test_image(1:512,224:735, :); 
+image = image(1:512,224:735, :); %crop image for now
+image = imrotate(image, 180); %flip image around for testing
+
 
 %Perform shadow detection
 shadow_hazard_map = shadowBasedDetectionWrapper(test_image, params);
