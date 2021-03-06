@@ -1,4 +1,4 @@
-function hazardMap = shadowBasedDetectionWrapper(image, params)
+function hazardMap = shadowBasedDetectionWrapper(image, params, showResults)
 %{
 Senior Design
 Team Shamrock
@@ -8,6 +8,8 @@ Melissa Rowland
 inputs: 
 image - image of asteroid surface
 params - struct containing parameters about simulation
+showResults - bool, indicates whether to make an output image with detected
+              shadows & hazards
 
 outputs: 
 hazardMap - binary hazard map with hazard locations marked as '1', safe
@@ -34,7 +36,6 @@ Future improvements:
 %Parameters
 smooth_sigma = 2;
 shadow_size_threshold = 500;
-%In future, pass in the following from param struct in main
 sun_vertical_angle = params.sunVerticalAngle;
 sun_dir = params.sunDirection;
 height_threshold = params.hazardHeightThreshold; %pixels - TODO convert to m!!
@@ -54,7 +55,7 @@ im_shadows2 = removeShadow([258, 230], im_shadows);
 
 %Find boundaries of shadow & compute its length
 im_bound = findBoundaries(im_shadows2, false);
-shadow_length = computeShadowSize(im_bound, 'y');
+shadow_length = computeShadowSize(im_bound, sun_dir);
 
 %Estimate object size
 %Currently outputs in pixels - TODO convert to m
@@ -67,6 +68,11 @@ hazardMap = zeros(size(im_shadows));
 %Apply threshold to determine if rock is hazardous
 if height > height_threshold
     hazardMap = mapRocks(im_bound, diameter, sun_dir, size(hazardMap));
+end
+
+%Display results if desired
+if showResults
+    displayShadowsAndHazards(image, im_bound, hazardMap);
 end
 
 end

@@ -25,14 +25,17 @@ clear all
 close all
 
 %Read in image, convert to grayscale
-im_orig = imread('blender_images/1sphere_sun_20.png');
+im_orig = imread('../blender_images/1sphere_sun_20.png');
 im_gray = rgb2gray(im_orig);
 %Optional resizing to 512 x 512
 im_gray = imresize(im_gray, 1/2);
 im_gray = im_gray(1:512,224:735); 
+im_gray = imrotate(im_gray, 270);
 figure
 imshow(im_gray)
 title('Original Image')
+
+sun_dir = 'right';
 
 %Perform smoothing & wavelet transform
 im_smooth = smooth(im_gray, 2);
@@ -47,14 +50,15 @@ plotBoundaries = false;
 im_shadows = findShadows(im_mw, threshold, plotBoundaries);
 
 %Manually remove object that shows up as shadow from blender image
-im_shadows2 = removeShadow([258, 230], im_shadows);
+%im_shadows2 = removeShadow([258, 230], im_shadows);
+im_shadows2 = removeShadow([245, 314], im_shadows);
 figure
 imshow(im_shadows2);
 title('Significant Shadow in Image')
 
 %Find boundaries of shadow & compute its length
 im_bound = findBoundaries(im_shadows2, false);
-shadow_length = computeShadowSize(im_bound, 'y');
+shadow_length = computeShadowSize(im_bound, sun_dir);
 
 %Estimate object size
 sunVerticalAngle = 20; %degrees
@@ -66,27 +70,11 @@ height = round(height);
 %TODO need to convert pixels to m!
 height_threshold = 15; %pixels
 hazard_map = zeros(size(im_shadows));
-sun_dir = 'south';
 %Apply threshold to determine if rock is hazardous
 if height > height_threshold
     hazard_map = mapRocks(im_bound, diameter, sun_dir, size(hazard_map));
 end
 
-%Make output image
-%Convert hazard map to binary image to reuse findBoundaries function
-hazard_image = hazard_map;
-hazard_idx = find(hazard_map == 1);
-safe_idx = find(hazard_map == 0);
-hazard_image(hazard_idx) = 0;
-hazard_image(safe_idx) = 256;
-bound_idx = findBoundaries(hazard_image, false);
-%Plot boundaries of hazard and shadow on top of original image
-figure
-imshow(im_gray)
-hold on
-plot(im_bound(:,2), im_bound(:,1), '.r', 'MarkerSize', 3)
-plot(bound_idx(:,2), bound_idx(:,1), '.b', 'MarkerSize', 3)
-hold off
-title('Hazard Location Estimate')
+displayShadowsAndHazards(im_gray, im_bound, hazard_map);
 
 
