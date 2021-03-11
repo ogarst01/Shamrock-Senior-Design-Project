@@ -1,7 +1,7 @@
 %{
 Senior Design
 Team Shamrock
-last updated: 2/27/21
+last updated: 3/10/2021
 
 main.m
 
@@ -18,7 +18,7 @@ close all
 
 %% Add paths to source code for each feature
 
-addpath('ShadowBasedHazardDetection', 'HazardAvoidance')
+addpath('ShadowBasedHazardDetection', 'HazardAvoidance','LidarMapping')
 
 
 %% Set up params struct
@@ -48,6 +48,11 @@ shadow_hazard_map = shadowBasedDetectionWrapper(test_image, params);
 %Perform TRN
 
 %% Lidar Processing
+% enter filenames for the two data files: 
+%lidarDatafile = 'lidar2.txt';
+%IMUDatafile   = 'IMU_data.txt';
+
+lidar_hazard_map = lidarMain(m,n);
 
 %% IMU Data Processing
 
