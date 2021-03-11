@@ -26,7 +26,7 @@ hazard_idx = find(hazardMap == 1);
 safe_idx = find(hazardMap == 0);
 hazard_image(hazard_idx) = 0;
 hazard_image(safe_idx) = 256;
-bound_idx = findBoundaries(hazard_image, false);
+bound_idx = findBoundaries(hazard_image, false, []);
 
 %Plot boundaries of hazard and shadow on top of original image
 figure

@@ -3,7 +3,7 @@ function hazardMap = shadowBasedDetectionWrapper(image, params, showResults)
 Senior Design
 Team Shamrock
 Melissa Rowland
-2/27/21
+Updated: 3/11/21
 
 inputs: 
 image - image of asteroid surface
@@ -20,13 +20,11 @@ Process image to find significant shadows and output a hazard map of
 hazardous rocks based on those shadows.
 
 Currently: 
--only works for one shadow
--only works for sunlight coming straight from bottom of image
--estimates rock location as a square
+-only works for sunlight coming straight from top/bottom/left/right of
+image
+-estimates rock location as a rectangle
 
 Future improvements:
--compute rock locations for multiple shadows
--compute rock location for sunlight coming from all 4 straight directions
 -compute rock location for sunlight coming from angle
 -estimate rock location as an ellipse
 -improve accuracy of size estimation
@@ -48,27 +46,36 @@ im_smooth = smooth(im_gray, smooth_sigma);
 im_mw = multiscaleWavelet(im_smooth);
 
 %Remove insignificant shadows
-im_shadows = findShadows(im_mw, shadow_size_threshold, false);
-%Currently for testing -- 
-%Manually remove object that shows up as shadow from blender image
-im_shadows2 = removeShadow([258, 230], im_shadows);
+[im_shadows, shadow_info, connected] = findShadows(im_mw, shadow_size_threshold, false);
 
-%Find boundaries of shadow & compute its length
-im_bound = findBoundaries(im_shadows2, false);
-shadow_length = computeShadowSize(im_bound, sun_dir);
-
-%Estimate object size
-%Currently outputs in pixels - TODO convert to m
-[diameter, height] = computeRockSize(shadow_length, sun_vertical_angle);
-diameter = round(diameter);
-height = round(height);
-
-%Make hazard map
+%Initialize matrices
+%todo initialize shadow info mat
+[info_rows, info_cols] = size(shadow_info);
 hazardMap = zeros(size(im_shadows));
-%Apply threshold to determine if rock is hazardous
-if height > height_threshold
-    hazardMap = mapRocks(im_bound, diameter, sun_dir, size(hazardMap));
+
+%Find boundaries of shadows
+im_bound = findBoundaries(im_shadows, false, connected);
+
+%Loop over all significant shadows
+for i = 1:info_rows
+    %Compute shadow lengths
+    this_mark = shadow_info(i,1);
+    this_idx = find(im_bound(:,3) == this_mark);
+    shadow_info(i, info_cols+1) = computeShadowSize(im_bound(this_idx(1):this_idx(end),:), sun_dir);
+    
+    %Estimate object size
+    %Currently outputs in pixels - TODO convert to m
+    [diameter, height] = computeRockSize(shadow_info(i,5), sun_vertical_angle);
+    shadow_info(i,6) = round(diameter);
+    shadow_info(i,7) = round(height);
+    
+    %Make hazard map
+    hazardMap = mapRocks(im_bound(this_idx(1):this_idx(end),:), height, diameter, height_threshold, sun_dir, hazardMap);
 end
+
+%5th col of shadow info -- shadow size
+%6th col of shadow info -- shadow diameter
+%7th col of shadow info -- shadow height
 
 %Display results if desired
 if showResults
