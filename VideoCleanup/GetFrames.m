@@ -1,7 +1,17 @@
 %function [img, time] = makeEmoji(inputArg1,inputArg2)
 % Load in movie file (TBD): 
+
+cd ..
+cd Data
+
 filename = 'IMG_5472.MOV';
+
 v = VideoReader(filename);
+
+%%
+
+cd .. 
+cd VideoCleanup
 
 filenameBeg = 'frame_';
 filenameEnd = '.png';
@@ -33,10 +43,13 @@ for i = 1:10
     figure,
     imshow(quant8_I_max)
 
-    
     FileName=[filenameBeg,num2str(i),filenameEnd];
     
+    cd frames; 
+    
     imwrite(quant8_I_max,FileName)
+    
+    cd ..
     
     BW = imbinarize(img); 
     CC = bwconncomp(BW);

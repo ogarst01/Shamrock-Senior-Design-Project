@@ -20,7 +20,6 @@ close all
 
 addpath('ShadowBasedHazardDetection', 'HazardAvoidance','LidarMapping')
 
-
 %% Set up params struct
 
 params.sunVerticalAngle = 20;
