@@ -51,8 +51,12 @@ shadow_hazard_map = shadowBasedDetectionWrapper(test_image, params);
 % enter filenames for the two data files: 
 %lidarDatafile = 'lidar2.txt';
 %IMUDatafile   = 'IMU_data.txt';
+%m = 2720;
+%n = 1530;
+%[lidar_hazard_map,xq,yq,vq] = lidarMain(m,n);
 
-lidar_hazard_map = lidarMain(m,n);
+%figure,
+%scatter(lidar_hazard_map)
 
 %% IMU Data Processing
 

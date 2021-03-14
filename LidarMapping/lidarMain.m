@@ -6,6 +6,7 @@ Olive Garst
 03/03/21
 
 inputs:
+0. M, N - size of the photo to be compared to...
 1. raw text files of Lidar + IMU data
 2. coordinates of data aquisition based on IMU data (velocity + time)
 3. information about time stamps list for when photos were taken ... 
@@ -24,7 +25,7 @@ questions/future improvements:
 -is there a faster/less computationally expensive algorithm that can be
 implemented?
 %}
-function hazardMap = lidarMain(M,N)
+function [hazMap,xq,yq,vq] = lidarMain(M,N)
 
 Lidarfilename = 'lidar2.txt';
 IMUfilename = 'IMU_data.txt';
@@ -69,7 +70,7 @@ title('gradient of gradient plot')
 
 % for now, just grab values over a known threshold as groun as a hazard... 
 gradZ = gradient(z);
-gradThresh = 0.1;
+avrgGradZ = mean(gradZ);
 
 % grab the x highest values of the total dataset: 
 
@@ -78,16 +79,24 @@ avrgZ = mean(z);
 
 % also make a histogram of height data to better visualize:
 nbins = 20;
-titleWord = sprintf('histogram of heights of rocks, with mean values of %g',avrgZ)
+titleWord = sprintf('histogram of heights of rocks, with mean values of %g',avrgZ);
 
 figure,
 histogram(z,nbins)
 title(titleWord)
 
-% first - anything in the top 50% assume that it is a hazard
-gradZ((gradZ) >= 0.75*avrgZ)=1;
+hazMap = z;
 
-gradZ((gradZ) < 1)=0;
+% first - anything in the top 50% assume that it is a hazard
+hazMap((gradZ) >= avrgGradZ)=1;
+
+hazMap((hazMap) < 1)=0;
+
+hazMap((hazMap) > 0.999)=1;
+
+figure,
+plot3(x,y,hazMap)
+title('hazard map')
 
 % these values are safe. 
 % 
@@ -95,13 +104,14 @@ gradZ((gradZ) < 1)=0;
 % 
 % gradZ(abs(gradZ) > gradThresh)=1;
 
-[xq,yq] = meshgrid(-10:.2:10, -10:.2:10);
-vq = griddata(x,y,gradZ,xq,yq);
+% make the mesh grid the same size as the photos: 
+[xq,yq] = meshgrid(linspace(-10,10,M), linspace(-10,10,N));
+vq = griddata(x,y,hazMap,xq,yq);
 
 figure,
 mesh(xq,yq,vq)
 hold on
-plot3(x,y,gradZ,'o')
+plot3(x,y,hazMap,'o')
 title('hazard map')
 
 %%
@@ -113,19 +123,19 @@ title('hazard map')
 % figure,
 % imshow(img)
 %%
-hazardMap = [];
-
-    % make the hazard map based on high sloped areas and what's in between
-    for i = 1:length(Xs)
-        for j = 1:length(Ys)
-            if(gradient(z) <= gradThresh)
-                % if the slpe is pretty unchanging, then make the color = 
-                hazardMap(i,j) = 0;
-            else
-                hazardMap(i,j) = 1;
-            end
-        end
-    end
+% hazardMap = [];
+% 
+%     % make the hazard map based on high sloped areas and what's in between
+%     for i = 1:length(Xs)
+%         for j = 1:length(Ys)
+%             if(gradient(z) <= gradThresh)
+%                 % if the slpe is pretty unchanging, then make the color = 
+%                 hazardMap(i,j) = 0;
+%             else
+%                 hazardMap(i,j) = 1;
+%             end
+%         end
+%     end
 
 % before returning, need to make sure these two hazard maps have the right 
 % matching dimensions... 
