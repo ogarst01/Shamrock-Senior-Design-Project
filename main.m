@@ -24,8 +24,8 @@ addpath('ShadowBasedHazardDetection', 'HazardAvoidance')
 %% Set up params struct
 
 params.sunVerticalAngle = 20;
-params.sunDirection = 'bottom';
-params.hazardHeightThreshold = 15; %pixels (TODO convert to m)
+params.sunDirection = 'top';
+params.hazardHeightThreshold = 5; %pixels (TODO convert to m)
 params.landerFootprint = 10; %pixels (TODO convert to m?)
 
 %% Image Processing
@@ -33,10 +33,11 @@ params.landerFootprint = 10; %pixels (TODO convert to m?)
 %loop over them
 
 %Read in image
-test_image = imread('blender_images/1sphere_sun_20.png');
+test_image = imread('test_images/BennuLargestBoulder.png');
 %resize & crop image for now
 test_image = imresize(test_image, 1/2);
-test_image = test_image(1:512,224:735, :);
+%test_image = test_image(1:512,224:735, :); %for blender images
+%test_image = test_image(1:300, :, :);
 
 %Perform shadow detection
 shadow_hazard_map = shadowBasedDetectionWrapper(test_image, params, true);

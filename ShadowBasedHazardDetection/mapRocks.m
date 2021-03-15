@@ -50,10 +50,10 @@ if rockHeight > heightThreshold
         midPointX = round(midPointX);
         startPointX = midPointX - rockRad;
         endPointX = midPointX + rockRad;
-    elseif strcmp(sunDirection, 'left')
+    elseif strcmp(sunDirection, 'right')
         startPointX = max(shadowBoundaries(:, 2));
         endPointX = startPointX + 2 * rockRad;
-    elseif strcmp(sunDirection, 'right')
+    elseif strcmp(sunDirection, 'left')
         endPointX = min(shadowBoundaries(:, 2));
         startPointX = endPointX - 2 * rockRad;
     else
@@ -79,11 +79,14 @@ if rockHeight > heightThreshold
     %change start/end points to edge if they are outside image
     if endPointX > mapSize(1)
         endPointX = mapSize(1);
-    elseif startPointX < 1
+    end
+    if startPointX < 1
         startPointX = 1;
-    elseif endPointY > mapSize(2)
+    end
+    if endPointY > mapSize(2)
         endPointY = mapSize(2);
-    elseif startPointY < 1
+    end
+    if startPointY < 1
         startPointY = 1;
     end
 

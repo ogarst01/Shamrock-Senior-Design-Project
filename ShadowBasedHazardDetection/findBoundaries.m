@@ -46,6 +46,11 @@ for i = 1:row
                 bound_idx(bound_row+1, :) = [i, j];
             elseif (j > 1 && image(i, j-1) == 256)
                 bound_idx(bound_row+1, :) = [i, j];
+            %check if edge of image
+            elseif i == 1 || i == row
+                bound_idx(bound_row+1, :) = [i, j];
+            elseif j == 1 || j == col
+                bound_idx(bound_row+1, :) = [i, j];
             end
         end
     end

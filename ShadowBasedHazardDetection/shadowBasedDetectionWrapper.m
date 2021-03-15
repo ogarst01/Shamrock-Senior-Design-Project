@@ -33,7 +33,7 @@ Future improvements:
 
 %Parameters
 smooth_sigma = 2;
-shadow_size_threshold = 500;
+shadow_size_threshold = 250;
 sun_vertical_angle = params.sunVerticalAngle;
 sun_dir = params.sunDirection;
 height_threshold = params.hazardHeightThreshold; %pixels - TODO convert to m!!
@@ -61,7 +61,7 @@ for i = 1:info_rows
     %Compute shadow lengths
     this_mark = shadow_info(i,1);
     this_idx = find(im_bound(:,3) == this_mark);
-    shadow_info(i, info_cols+1) = computeShadowSize(im_bound(this_idx(1):this_idx(end),:), sun_dir);
+    shadow_info(i, info_cols+1) = computeShadowSize(im_bound(im_bound(:,3) == this_mark,:), sun_dir);
     
     %Estimate object size
     %Currently outputs in pixels - TODO convert to m
@@ -70,7 +70,7 @@ for i = 1:info_rows
     shadow_info(i,7) = round(height);
     
     %Make hazard map
-    hazardMap = mapRocks(im_bound(this_idx(1):this_idx(end),:), height, diameter, height_threshold, sun_dir, hazardMap);
+    hazardMap = mapRocks(im_bound(im_bound(:,3) == this_mark,:), height, diameter, height_threshold, sun_dir, hazardMap);
 end
 
 %5th col of shadow info -- shadow size
