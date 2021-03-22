@@ -8,7 +8,7 @@ Melissa Rowland
 
 inputs:
 hazardMap - binary image of hazards. '1' indicates hazard
-landerFoot - footprint of lander (in pixels)
+params - struct containing info about simulation
 
 outputs:
 xCoord - x coordinate of optimal landing site (in pixels)
@@ -51,18 +51,21 @@ distanceMapCropped(:, (numCol-(landerFoot+1)):numCol) = 0;
 [maxDistCols, maxColInd] = max(distanceMapCropped, [], 1);
 [maxDist, maxRowInd] = max(maxDistCols);
 
-%Sanity check: maxDist > 0
-if maxDist <= 0
-    fprintf('ERROR: max distance to hazard is 0')
-end
-
-%Warning if footprint of lander will hit hazard
-if maxDist <= landerFoot
-    fprintf('WARNING: max distance to hazard is less than footprint size.')
-end
-
 %Return coordinates of chosen landing site
 xCoord = maxRowInd;
 yCoord = maxColInd(maxRowInd);
+
+%Print errors if no safe landing site is available
+if maxDist <= 0 %Check if the entire map is hazard
+    fprintf('ERROR: Max distance to hazard is 0. No safe landing site available.\n')
+    xCoord = [];
+    yCoord = [];
+elseif maxDist <= landerFoot %Check if lander footprint falls within hazard area
+    fprintf('ERROR: Max distance to hazard is less than footprint size. No safe landing site available.\n')
+    xCoord = [];
+    yCoord = [];
+end
+
+
 
 end
