@@ -24,7 +24,7 @@ addpath('ShadowBasedHazardDetection', 'HazardAvoidance','LidarMapping')
 
 params.sunVerticalAngle = 20;
 params.sunDirection = 'top';
-params.hazardHeightThreshold = 15; %pixels (TODO convert to m)
+params.hazardHeightThreshold = 5; %pixels (TODO convert to m)
 params.landerFootprint = 10; %pixels (TODO convert to m?)
 
 %% Image Processing
@@ -32,15 +32,14 @@ params.landerFootprint = 10; %pixels (TODO convert to m?)
 %loop over them
 
 %Read in image
-image = imread('blender_images/1sphere_sun_20.png');
+test_image = imread('test_images/BennuLargestBoulder.png');
 %resize & crop image for now
 test_image = imresize(test_image, 1/2);
-image = image(1:512,224:735, :); %crop image for now
-image = imrotate(image, 180); %flip image around for testing
-
+%test_image = test_image(1:512,224:735, :); %for blender images
+%test_image = test_image(1:300, :, :);
 
 %Perform shadow detection
-shadow_hazard_map = shadowBasedDetectionWrapper(test_image, params);
+shadow_hazard_map = shadowBasedDetectionWrapper(test_image, params, true);
 
 %Perform computer vision
 
