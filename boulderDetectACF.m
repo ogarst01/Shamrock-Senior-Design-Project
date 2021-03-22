@@ -40,7 +40,7 @@ srLoc = table(srLocFileName',srLocData');
 acfSRDetector = trainACFObjectDetector(srLoc,'NegativeSamplesFactor',2);
 
 %%
-img = imread('miniset_test_image2.jpeg');
+img = imread('set_testimg1.png');
 
 [bboxesBoulder,scoresBoulder] = detect(acfBoulderDetector,img);
 [bboxesSR,scoresSR] = detect(acfSRDetector,img);
@@ -68,3 +68,24 @@ end
 figure
 imshow(tempimg)
 
+%% Create Hazard Map 
+[w,l,~] = size(img);
+hazardMap = zeros(w,l);
+
+for i = 1:length(scoresBoulder)
+   if(scoresBoulder(i) > thresholdB)
+        currbbox(1,:) = bboxesBoulder(i,:);
+        hazardMap(currbbox(2):currbbox(2)+currbbox(4),currbbox(1):currbbox(1)+currbbox(3)) = 1;
+   end
+end
+
+
+for i = 1:length(scoresSR)
+   if(scoresSR(i) > thresholdSR)
+        currbbox(1,:) = bboxesSR(i,:);
+        hazardMap(currbbox(2):currbbox(2)+currbbox(4),currbbox(1):currbbox(1)+currbbox(3)) = 2;
+   end
+end
+
+%%
+image(hazardMap);
