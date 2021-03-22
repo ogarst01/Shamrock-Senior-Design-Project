@@ -26,6 +26,7 @@ params.sunVerticalAngle = 20;
 params.sunDirection = 'top';
 params.hazardHeightThreshold = 5; %pixels (TODO convert to m)
 params.landerFootprint = 10; %pixels (TODO convert to m?)
+params.showHDAOutput = true;
 
 %% Image Processing
 %TODO: read in series of images and perform the following activities in a
@@ -66,17 +67,11 @@ shadow_hazard_map = shadowBasedDetectionWrapper(test_image, params, true);
 hazard_map = shadow_hazard_map;
 
 %Run HDA algorithm
-[xLand, yLand, distanceMap] = HDA1(hazard_map, params);
+HDAWrapper(hazard_map, params);
 
 %% Format outputs
 
-%Plot DTNH map with marker for chosen site
-%TODO make a separate function
-figure
-image(distanceMap)
-hold on
-plot(xLand, yLand, 'r+', 'MarkerSize', 10, 'LineWidth', 2)
-title('DTNH Map with Chosen Site')
+
 
 
 
