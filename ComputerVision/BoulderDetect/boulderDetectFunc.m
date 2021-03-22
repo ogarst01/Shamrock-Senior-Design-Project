@@ -1,12 +1,21 @@
-function hazardMap = boulderDetectFunc(testImage,acfBoulderDetector,acfSRDetector, thresholdB, thresholdSR)
+function hazardMap = boulderDetectFunc(testImage, params)
 % function hazardMap = boulderDetect(testImage,acfBoulderDetector,acfSRDetector, thresholdB, thresholdSR)
 % Description: This function takes in pre-trained detectors and a test
 % image, and outputs a hazard map of the area based on the detected boulder and small rock area
 %
-% Note: Input- thresholdB: the threshold to use for the boulder detector
-%            - thresholdSR: the threshold to use for the small rock detector 
+% Note: Input from params
+%            - boulderDetectorThreshold: the threshold to use for the boulder detector
+%            - smallRockDetectorThreshold: the threshold to use for the small rock detector 
 %            - Both are a number, n, between 0 - 100, n means that the
 %            detector is n% confident about the detection
+%            - boulderDetectorString: path/title of boulder detector to use
+%            - smallRockDetectorString: path/title of small rock detector to use
+
+load(params.boulderDetectorString)
+load(params.smallRockDectectorString)
+
+thresholdB = params.boulderDetectorThreshold;
+thresholdSR = params.smallRockDetectorThreshold;
 
 img = imread(testImage);
 
