@@ -29,6 +29,7 @@ current model:
 bottom, or horizontally from left or right
 -along line of sunlight, assumes rock starts at edge of shadow
 -along other axis, assumes midpoint of rock position is average
+-considers the shadow region itself as hazardous
 
 questions/future improvements:
 -work for sun coming in along an angle
@@ -62,13 +63,13 @@ if rockHeight > heightThreshold
 
     %find where the rock starts in Y
     if strcmp(sunDirection, 'bottom')
+        startPointY = min(shadowBoundaries(:, 1));
         %assume bottom of shadow is start of rock
-        startPointY = max(shadowBoundaries(:, 1));
-        endPointY = startPointY + 2 * rockRad;
+        endPointY = max(shadowBoundaries(:, 1)) + 2 * rockRad;
     elseif strcmp(sunDirection,'top')
+        endPointY = max(shadowBoundaries(:, 1));
         %assume top of shadow is start of rock
-        endPointY = min(shadowBoundaries(:, 1));
-        startPointY = endPointY - 2 * rockRad;
+        startPointY = min(shadowBoundaries(:, 1)) - 2 * rockRad;
     elseif strcmp(sunDirection, 'left') || strcmp(sunDirection, 'right')
         midPointY = mean(shadowBoundaries(:, 1));
         midPointY = round(midPointY);

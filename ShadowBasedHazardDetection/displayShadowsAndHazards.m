@@ -22,10 +22,8 @@ hazard locations overlaid onto the original image.
 
 %Convert hazard map to binary image to reuse findBoundaries function
 hazard_image = hazardMap;
-hazard_idx = find(hazardMap == 1);
-safe_idx = find(hazardMap == 0);
-hazard_image(hazard_idx) = 0;
-hazard_image(safe_idx) = 256;
+hazard_image(hazardMap == 1) = 0;
+hazard_image(hazardMap == 0) = 256;
 bound_idx = findBoundaries(hazard_image, false, []);
 
 %Plot boundaries of hazard and shadow on top of original image

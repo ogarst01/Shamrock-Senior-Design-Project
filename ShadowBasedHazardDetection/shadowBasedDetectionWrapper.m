@@ -23,6 +23,7 @@ Currently:
 -only works for sunlight coming straight from top/bottom/left/right of
 image
 -estimates rock location as a rectangle
+-assumes shadow region is also hazardous
 
 Future improvements:
 -compute rock location for sunlight coming from angle
