@@ -16,9 +16,14 @@ of separate sections?
 clear all
 close all
 
-%% Add paths to source code for each feature
+% Add paths to source code for each feature
 
-addpath('ShadowBasedHazardDetection', 'HazardAvoidance','LidarMapping')
+addpath('ShadowBasedHazardDetection', 'HazardAvoidance','LidarMapping','Data')
+% Read in photos from Video:
+% name of test run video:
+filename = 'run_1_March18.MP4';
+
+GetFrames_Video(filename);
 
 %% Set up params struct
 

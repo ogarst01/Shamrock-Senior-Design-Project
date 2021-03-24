@@ -1,4 +1,4 @@
-%function [img, time] = makeEmoji(inputArg1,inputArg2)
+function [img, time] = makeEmoji(inputArg1,inputArg2)
 % Load in movie file (TBD): 
 
 cd ..
@@ -20,7 +20,8 @@ frame = v.read();
 
 % number of frames grabbed 
 Fs = 1000;
-
+cd frames; 
+    
 for i = 1:10
     img = frame(:,:,:,13*i);
 
@@ -45,14 +46,11 @@ for i = 1:10
 
     FileName=[filenameBeg,num2str(i),filenameEnd];
     
-    cd frames; 
     
     imwrite(quant8_I_max,FileName)
     
     cd ..
-    
-    BW = imbinarize(img); 
-    CC = bwconncomp(BW);
-    L = labelmatrix(CC);
+
 end
-%end
+
+end
