@@ -56,14 +56,10 @@ for i = 1:numPics
     shadow_hazard_map = shadowBasedDetectionWrapper(test_image, params, true);
 
     cd ..
-    cd hazard_Maps;
-    
+    cd haza
     % save the data:
     matName = [startName, num2str(i), endMatName];
-    save(matName,'shadow_hazard_map');
-    
-    cd ..
-    cd frames;
+    save(matName,shadow_hazard_map);
 end
 %Perform computer vision
 
