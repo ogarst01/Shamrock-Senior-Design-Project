@@ -86,16 +86,12 @@ end
 %Perform TRN
 
 %% Lidar Processing
-% enter filenames for the two data files: 
-%lidarDatafile = 'lidar2.txt';
-%IMUDatafile   = 'IMU_data.txt';
-%m = 2720;
-%n = 1530;
-%[lidar_hazard_map,xq,yq,vq] = lidarMain(m,n);
-
-%figure,
-%scatter(lidar_hazard_map)
-
+cd LidarMapping;
+m = 720;
+n = 1280;
+[lidar_hazard_map,xq,yq,vq] = lidarMain(m,n);
+ 
+cd ..
 %% IMU Data Processing
 
 %% Kalman Filter 
