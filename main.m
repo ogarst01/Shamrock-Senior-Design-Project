@@ -1,9 +1,9 @@
 %% Generate IMU Data
 clear
-close all
+%close all
 
 
-N = 1000;
+N = 500;
 Fs = 100;
 
 params = gyroparams('RandomWalk',[0.2 0 0.03]);
@@ -19,6 +19,7 @@ angvel(:,3) = 5;
 IMU = imuSensor('SampleRate',Fs,'Gyroscope',params);
 
 [~, gyroData] = IMU(acc, angvel);
+
 
 % figure
 % plot3(angvel(:,1), angvel(:,2), angvel(:,3), '--', gyroData(:,1), gyroData(:,2), gyroData(:,3))
@@ -42,10 +43,10 @@ filt = KalmanFilter;
 
 pos = Position;
 
-T = 1000;
+T = 500;
 pos.delT = 1;
-pos.siga = 5;
-pos.sigp = 0.5;
+pos.siga = 50;
+pos.sigp = 0.005;
 x = [0;0;0];
 u = 1;
 kalman = zeros(3,T);
@@ -55,16 +56,16 @@ filt = SetKF(filt,x,A,B,H,P,Q,R);
 
 for i = 1:T
     kalman(:,i) = filt.x;
-    filt = Step(filt,u,transpose(gyroData(i,:)));
+    filt = Step(filt,u,transpose(gyroData(i,1)));
 end
 
 figure
-t = 0:999;
+t = 0:499;
 hold on 
 plot(t,angvel(:,1))
 plot(t,kalman(1,:))
 plot(t,gyroData(:,1))
 legend('true','KF','IMU')
-
-
-
+xlabel('Time')
+ylabel('Position')
+title('Kalman Filter 1D Position Correction')
