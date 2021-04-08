@@ -52,8 +52,8 @@ pos = Position;
 
 T = N;
 pos.delT = 1;
-pos.siga = 10;
-pos.sigp = 0.5;
+pos.siga = 200;
+pos.sigp = 200;
 x = [0;0;0];
 u = 1;
 kalman = zeros(3,T);

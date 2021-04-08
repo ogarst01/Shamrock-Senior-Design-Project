@@ -1,5 +1,5 @@
 classdef Position
-    %POSITION create position tracking matrices to feed Kalman Filter
+    %POSITION create position tracking matrices in 1 dimension to feed Kalman Filter
     
     properties
         delT         % Time step
