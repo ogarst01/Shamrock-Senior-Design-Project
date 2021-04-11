@@ -12,12 +12,12 @@ function hazardMap = boulderDetectFunc(testImage, params)
 %            - smallRockDetectorString: path/title of small rock detector to use
 
 load(params.boulderDetectorString)
-load(params.smallRockDectectorString)
+load(params.smallRockDetectorString)
 
 thresholdB = params.boulderDetectorThreshold;
 thresholdSR = params.smallRockDetectorThreshold;
 
-img = imread(testImage);
+img = testImage;
 
 [bboxesBoulder,scoresBoulder] = detect(acfBoulderDetector,img);
 [bboxesSR,scoresSR] = detect(acfSRDetector,img);

@@ -133,20 +133,20 @@ if rockHeight >= heightThreshold
        %}
    end
    
-   
+    %fill in hazard map
+    xv = [corner1(1) corner3(1) corner4(1) corner2(1) corner1(1)];
+    yv = [corner1(2) corner3(2) corner4(2) corner2(2) corner1(2)];
+    xq = repmat(1:mapSize(2), mapSize(1),1);
+    yq = repmat([1:mapSize(1)]', 1, mapSize(2));
+    in = zeros(mapSize(1), mapSize(2));
+    for i = 1:mapSize(1)
+        in(i, :) = inpolygon(xq(i,:), yq(i,:), xv, yv);
+    end
+    logical_in = logical(in);
+    hazardMapOut(logical_in) = 1;
+    
 end
 
-%fill in hazard map
-xv = [corner1(1) corner3(1) corner4(1) corner2(1) corner1(1)];
-yv = [corner1(2) corner3(2) corner4(2) corner2(2) corner1(2)];
-xq = repmat(1:mapSize(2), mapSize(1),1);
-yq = repmat([1:mapSize(1)]', 1, mapSize(2));
-in = zeros(mapSize(1), mapSize(2));
-for i = 1:mapSize(1)
-    in(i, :) = inpolygon(xq(i,:), yq(i,:), xv, yv);
-end
-logical_in = logical(in);
-hazardMapOut(logical_in) = 1;
 
 %{
 figure

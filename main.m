@@ -21,16 +21,18 @@ close all
 addpath('ShadowBasedHazardDetection', 'HazardAvoidance','LidarMapping',genpath('Data'), genpath('ComputerVision'))
 % Read in photos from Video:
 % name of test run video:
-filename = 'run_1_March18.MP4';
+filename = 'april5_run1.MP4';
 
 numPics = GetFrames_Video(filename);
 
 %% Set up params struct
 
 %For shadow detection
-params.sunVerticalAngle = 20;
-params.sunDirection = 'top';
-params.hazardHeightThreshold = 5; %pixels (TODO convert to m)
+params.smoothSigma = 2;
+params.shadowSizeThreshold = 100; %pixels
+params.sunVerticalAngle = 30;
+params.sunAzimuthAngle = 190;
+params.hazardHeightThreshold = 1; %pixels (TODO convert to m)
 params.landerFootprint = 10; %pixels (TODO convert to m?)
 
 %For computer vision
@@ -53,17 +55,14 @@ endMatName = '.mat';
 %Todo - loop over all pics (i = 1:numPics). currently only doing a few for faster runs
 for i = 1:3
     namePic = [startName, num2str(i), endName];
-    %Read in image
-    % test_image = imread('test_images/BennuLargestBoulder.png');
 
     test_image = imread(namePic);
-    %resize & crop image for now
+    
+    %resize image for now for faster runs
     test_image = imresize(test_image, 1/4);
-    %test_image = test_image(1:512,224:735, :); %for blender images
-    %test_image = test_image(1:300, :, :);
 
     %Perform shadow detection
-    shadow_hazard_map = shadowBasedDetectionWrapper(test_image, params, true);
+    shadow_hazard_map = shadowBasedDetectionWrapperAz(test_image, params, true);
     
     %Perform computer vision
     cv_hazard_map = boulderDetectFunc(test_image, params);
@@ -81,12 +80,9 @@ for i = 1:3
     cd ..
     cd frames;
 end
-%Perform computer vision
-
-%Perform TRN
 
 %% Lidar Processing
-cd LidarMapping;
+cd ../../LidarMapping;
 m = 720;
 n = 1280;
 [lidar_hazard_map,xq,yq,vq] = lidarMain(m,n);

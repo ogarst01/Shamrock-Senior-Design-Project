@@ -34,7 +34,7 @@ Future improvements:
 smooth_sigma = params.smoothSigma;
 shadow_size_threshold = params.shadowSizeThreshold;
 sun_vertical_angle = params.sunVerticalAngle;
-sun_dir = params.sunDirection;
+sun_azimuth_angle = params.sunAzimuthAngle;
 height_threshold = params.hazardHeightThreshold; %pixels - TODO convert to m!!
 
 %Image pre-processing: make grayscale, smooth
@@ -51,6 +51,7 @@ im_mw = multiscaleWavelet(im_smooth);
 %todo initialize shadow info mat
 [info_rows, ~] = size(shadow_info);
 hazardMap = zeros(size(im_shadows));
+mapSize = size(hazardMap);
 
 %Find boundaries of shadows
 im_bound = findBoundaries(im_shadows, false, connected);
@@ -79,7 +80,7 @@ for i = 1:info_rows
     [diameter, height] = computeRockSize(shadow_size, sun_vertical_angle);
     
     %Make hazard map
-    hazardMap = mapRocksAz(this_shadow_bound, height, diameter, sun_azimuth_angle, height_threshold, hazardMap, m1, m2, min_point, max_point, im_small);
+    hazardMap = mapRocksAz(this_shadow_bound, height, diameter, sun_azimuth_angle, height_threshold, hazardMap, m1, m2, min_point, max_point, im_gray);
 end
 
 %Display results if desired
