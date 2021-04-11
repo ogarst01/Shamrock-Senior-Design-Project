@@ -21,8 +21,7 @@ Recursively find the pixels that make up the shadow group and count the
 size of the group.
 
 questions/future improvements:
--possibly remove the connectivity matrix and just count the number of
-pixels?
+
 %}
 
 updatedConnectivity = connectivityMat;
@@ -43,7 +42,7 @@ neighbors = [n1; n2; n3; n4; n5; n6; n7; n8];
 
 for i = 1:length(neighbors)
     %check that index is within bounds
-    if neighbors(i,1) <= row && neighbors(i,1) >= 1 && neighbors(i,2) <= col && neighbors(i,2) >= 1
+    if neighbors(i,2) <= row && neighbors(i,1) >= 1 && neighbors(i,1) <= col && neighbors(i,2) >= 1
         %check if neighbor is black
         if(image(neighbors(i,1), neighbors(i,2)) == 0 && updatedConnectivity(neighbors(i,1), neighbors(i,2)) ~= mark)
             %update connectivityMat
