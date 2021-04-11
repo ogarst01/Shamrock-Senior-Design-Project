@@ -30,8 +30,8 @@ bound_idx = findBoundaries(hazard_image, false, []);
 figure
 imshow(origImage)
 hold on
-plot(shadowBoundaries(:,2), shadowBoundaries(:,1), '.r', 'MarkerSize', 3)
-plot(bound_idx(:,2), bound_idx(:,1), '.b', 'MarkerSize', 3)
+plot(shadowBoundaries(:,1), shadowBoundaries(:,2), '.r', 'MarkerSize', 3)
+plot(bound_idx(:,1), bound_idx(:,2), '.b', 'MarkerSize', 3)
 hold off
 title('Hazard Location Estimate')
 end
