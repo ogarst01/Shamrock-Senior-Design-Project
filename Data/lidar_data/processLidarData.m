@@ -5,9 +5,8 @@
 % note that if NAN is displayed - the start message from the arduino is
 % being sent // that's the beginning of data being aquired...
 
-% function array = processLidarData(filename)
+function [array,time_array] = processLidarData(filename)
     % read in the data
-    filename= 'april5_run1'
     f = fopen(filename);
     
     % throw an error if unopenable!
@@ -60,9 +59,8 @@
 %       line_ex = fgetl(f)
     
     fclose(f);
-    array = array;
     
-% end
+end
 
 % % 
 % THINGS TO NOTE

@@ -115,10 +115,6 @@ title('gradient plot')
 %%
 figure,
 [dfdx,dfdy] = gradient(vq);
-
-% varies the surface of the plot based on gradient instead 
-% of the value: 
-%https://www.mathworks.com/matlabcentral/answers/414044-surfplot-with-surface-color-as-a-function-of-gradient-slope
 h = surf(xq,yq,vq,sqrt(dfdx.^2 + dfdy.^2))
 get(h)
 set(h, 'linestyle','none');
@@ -129,9 +125,6 @@ xlabel('x value')
 ylabel('y value')
 zlabel('gradient of lidar data')
 
-
-figure, 
-surf(xq,yq,sqrt(dfdx.^2 + dfdy.^2))
 %%
 % initialize: 
 hazardMapLidar = zeros(1280,720);
