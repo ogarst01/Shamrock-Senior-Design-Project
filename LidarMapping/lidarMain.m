@@ -30,7 +30,7 @@ implemented?
 % put together something to parse ALL the photos and all the IMU data to 
 % add to the number of Lidar points we can use... 
 %}
-function [hazardMapLidar,xq,yq,vq] = lidarMain(M,N)
+function [hazardMapLidar,xq,yq,vq] = lidarMain(M,N, coords)
 
 % dimensions of images coming in:
 M = 720;
@@ -53,11 +53,9 @@ cd ..
 % for thius sensor is 81.92.. )
 lidar_data(lidar_data > 80) = 0;
 %%
-% now fake the IMU data:
-% x's will likely be an ordered list of location: 
-Xs_first = linspace(0,1,length(lidar_data)/5);
-Xs = [Xs_first, Xs_first, Xs_first, Xs_first, Xs_first, 0.5, 0.5, 0.5];
-Ys = randi(N, 1, length(lidar_data));
+% USE TRN coords for now: 
+Xs = coords(:,1);
+Ys = coords(:,2);
 Zs = lidar_data;
 
 %%

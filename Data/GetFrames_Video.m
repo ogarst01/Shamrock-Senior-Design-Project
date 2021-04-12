@@ -23,9 +23,9 @@ duration = v.Duration; % in seconds:
 
 frameRate = round(v.FrameRate);
 
-for i = 1:duration
+for i = 1:(duration*5)
     % DJI mavic mini frame rate is 60 frames/second:
-    img = frame(:,:,:,i*frameRate);
+    img = frame(:,:,:,i*frameRate*.2);
     
     % save the image under the second it was recorded
     FileName=[filenameBeg,num2str(i),filenameEnd];

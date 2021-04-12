@@ -21,7 +21,7 @@ close all
 addpath('ShadowBasedHazardDetection', 'HazardAvoidance','LidarMapping',genpath('Data'), genpath('ComputerVision'))
 % Read in photos from Video:
 % name of test run video:
-filename = 'run_1_March18.MP4';
+filename = 'april5_run1.MP4';
 
 numPics = GetFrames_Video(filename);
 
@@ -86,10 +86,21 @@ end
 %Perform TRN
 
 %% Lidar Processing
+
+
+% load the TRN coords: 
+cd TRN
+TRN_coords = load('TRN_cord_april5_run.mat');
+TRN_coords = cell2mat(struct2cell(TRN_coords));
+cd ..
+%%
+
+% load the Lidar coords: 
 cd LidarMapping;
+
 m = 720;
 n = 1280;
-[lidar_hazard_map,xq,yq,vq] = lidarMain(m,n);
+[lidar_hazard_map,xq,yq,vq] = lidarMain(m,n, TRN_coords);
  
 cd ..
 %% IMU Data Processing
