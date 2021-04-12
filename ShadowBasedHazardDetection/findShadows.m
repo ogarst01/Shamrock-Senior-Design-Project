@@ -90,7 +90,7 @@ for l = 1:smallSize
 end
 
 shadowInfo = largeInfoMat;
-connectMat = connected;
+connectMat = connected';
 
 if(plotBoundaries)
     boundPixelsOrig = findBoundaries(image, true, []);

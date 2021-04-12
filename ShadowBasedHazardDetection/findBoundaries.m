@@ -39,18 +39,18 @@ for i = 1:row
             %check adjacent pixels
             %if one is white, mark this as a boundary (red)
             if(i < row && image(i+1,j) == 256)
-                bound_idx(bound_row+1, :) = [i, j];
+                bound_idx(bound_row+1, :) = [j, i];
             elseif (i > 1 && image(i-1,j) == 256)
-                bound_idx(bound_row+1, :) = [i, j];
+                bound_idx(bound_row+1, :) = [j,i];
             elseif (j < col && image(i, j+1) == 256)
-                bound_idx(bound_row+1, :) = [i, j];
+                bound_idx(bound_row+1, :) = [j,i];
             elseif (j > 1 && image(i, j-1) == 256)
-                bound_idx(bound_row+1, :) = [i, j];
+                bound_idx(bound_row+1, :) = [j,i];
             %check if edge of image
             elseif i == 1 || i == row
-                bound_idx(bound_row+1, :) = [i, j];
+                bound_idx(bound_row+1, :) = [j, i];
             elseif j == 1 || j == col
-                bound_idx(bound_row+1, :) = [i, j];
+                bound_idx(bound_row+1, :) = [j, i];
             end
         end
     end
@@ -60,7 +60,7 @@ if plotOutput
     figure
     imshow(image)
     hold on
-    plot(bound_idx(:,2), bound_idx(:,1), '.r', 'MarkerSize', 3)
+    plot(bound_idx(:,1), bound_idx(:,2), '.r', 'MarkerSize', 3)
     hold off
 end
 

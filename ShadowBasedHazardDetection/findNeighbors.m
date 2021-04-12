@@ -21,8 +21,7 @@ Recursively find the pixels that make up the shadow group and count the
 size of the group.
 
 questions/future improvements:
--possibly remove the connectivity matrix and just count the number of
-pixels?
+
 %}
 
 updatedConnectivity = connectivityMat;
