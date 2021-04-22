@@ -37,7 +37,7 @@ im_bound = findBoundaries(im_shadows, false, connected);
 mapSize = size(im_shadows);
 hazardMap = zeros(mapSize);
 %Loop over all significant shadows
-for i = 1:info_rows
+for i = 1
     %Pull out the info about this shadow
     this_mark = shadow_info(i,1);
     this_shadow_bound = im_bound(im_bound(:,3) == this_mark,:);

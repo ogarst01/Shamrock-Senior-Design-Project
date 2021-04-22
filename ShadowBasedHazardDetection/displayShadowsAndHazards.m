@@ -34,7 +34,7 @@ imshow(origImage)
 hold on
 plot(shadowBoundaries(:,1), shadowBoundaries(:,2), '.r', 'MarkerSize', 3)
 if bound_row > 0
-    plot(bound_idx(:,1), bound_idx(:,2), '.b', 'MarkerSize', 3)
+    plot(bound_idx(:,1), bound_idx(:,2), '.c', 'MarkerSize', 3)
 end
 hold off
 title('Hazard Location Estimate')
