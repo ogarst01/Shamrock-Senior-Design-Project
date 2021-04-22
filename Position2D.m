@@ -4,7 +4,7 @@ classdef Position2D
     properties
         delT         % Time step
         sigp         % Position measurement noise
-        siga         % Acceleration measurement noise
+        siga         % Acceleration measurement noise (m/s^2)
     end
     
     methods

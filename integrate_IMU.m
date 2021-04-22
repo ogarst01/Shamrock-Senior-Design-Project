@@ -14,6 +14,8 @@ for i = 2:length(a)
     
 end
 
+
+
 position = p;
 
 end

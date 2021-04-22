@@ -6,11 +6,12 @@ classdef KalmanFilter
             x                        % Initial state estimate
             P                        % Initial covariance estimate
             Q                        % Covariance noise
-            R                        % Sensor covariance  
+            R                        % Sensor covariance
+            W                        % accelerometer noise
         end
         
         methods
-            function obj = SetKF(obj,x,A,B,H,P,Q,R)
+            function obj = SetKF(obj,x,A,B,H,P,Q,R, W)
                 obj.x = x;
                 obj.A = A;
                 obj.B = B;
@@ -18,18 +19,25 @@ classdef KalmanFilter
                 obj.P = P;
                 obj.Q = Q;
                 obj.R = R;
+                obj.W = W;
             end
-            function obj = Step(obj,u, z)
+            
+            function obj = Predict(obj, z_imu)
                 % Prediction Step
-                xnext = obj.A * obj.x + obj.B * u;
-                Pnext = (obj.A * obj.P) * transpose(obj.A) + obj.Q;
-                % Observation Step
-                y = z - obj.H * xnext;
-                sigma = obj.H * Pnext * transpose(obj.H) + obj.R;
-                % Update Step
-                K = Pnext * transpose(obj.H) / sigma;
-                obj.x = xnext + K * y;
-                obj.P = (eye(size(obj.P)) - K * obj.H) * Pnext;
+                obj.x = obj.A * obj.x + obj.B * z_imu;
+                %Q_imu = obj.B * obj.Q * transpose(obj.B);
+                obj.P = (obj.A * obj.P) * transpose(obj.A) + obj.Q + obj.B * obj.W * transpose(obj.B); 
             end
+            
+            function obj = Step(obj, z)
+                % Observation Step
+                y = z - obj.H * obj.x;
+                sigma = obj.H * obj.P * transpose(obj.H) + obj.R;
+                % Update Step
+                K = obj.P * transpose(obj.H) / sigma;
+                obj.x = obj.x + K * y;
+                obj.P = (eye(size(obj.P)) - K * obj.H) * obj.P;
+            end
+            
         end    
 end

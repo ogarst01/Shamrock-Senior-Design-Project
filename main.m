@@ -3,18 +3,20 @@ clear
 %close all
 
 
-N = 500;
+N = 1000;
 Fs = 100;
+delT = 0.1;
 
-params = accelparams('RandomWalk',[0.2 0.1 0.03]);
+params = accelparams('RandomWalk',[0.02 0.01 0.003]);
 
 t = (0:(1/Fs):((N-1)/Fs))';
-acc = zeros(N,3);
+acc = zeros(N,3); 
 angvel = zeros(N,3);
-acc(:,1) = 2;
+acc(:,1) = 0.2;
 acc(:,2) = .5*t;
 acc(:,3) = 0;
 
+z_true = integrate_IMU(acc(:,1), 0.1);
 
 IMU = imuSensor('SampleRate',Fs,'Accelerometer',params);
 
@@ -22,9 +24,6 @@ IMU = imuSensor('SampleRate',Fs,'Accelerometer',params);
 
 accData = -accData;
 
-for i = 1: length(accData)
-    
-end
 
 
 
@@ -38,6 +37,15 @@ end
 % legend('x (ground truth)', 'x (gyroscope)')
 
 
+%% Load IMU Data
+
+[time_array, test_data_array] = readingIMUData('April5_IMUtest.txt');
+time_array = time_array(2:end,:);
+test_data_array = test_data_array(2:1030,:); % 2:1030 hard coded for this data set. B/c end of video w/ some trash
+
+figure
+plot(test_data_array)
+legend('y', 'z')
 
 %% Load TRN Data
 
@@ -50,20 +58,24 @@ filt = KalmanFilter;
 
 pos = Position;
 
-T = N;
-pos.delT = 1;
-pos.siga = 10;
-pos.sigp = 0.5;
-x = [0;0;0];
-u = 1;
-kalman = zeros(3,T);
+T = size(test_data_array, 1);
+pos.delT = delT;
+pos.siga = 0.5;
+pos.sigp = 0.0005;
+pos.sig_TRN = 0.5; % meters
+x = [0;0];
+kalman = zeros(2,T);
 
-[A,B,H,P,Q,R] = CreateFiltObj(pos);
-filt = SetKF(filt,x,A,B,H,P,Q,R);
+z_imu = integrate_IMU(test_data_array,delT);
 
+[A,B,H,P,Q,R,W] = CreateFiltObj(pos);
+filt = SetKF(filt,x,A,B,H,P,Q,R,W);
+
+% filt = Step(filt,u,accData(i,1));
+% kalman(:,1) = filt.x;
 % for i = 1:T
-%     kalman2(:,i) = filt.x;
-%     filt = Step(filt,u,transpose(accData(i,2)));
+%     filt = Step(filt,u,imu_pos(i));
+%     kalman(:,i) = filt.x;
 % end
 
 % for i = 1:T/50
@@ -76,18 +88,14 @@ filt = SetKF(filt,x,A,B,H,P,Q,R);
 %     end  
 % end
 
-for i = 1:T
-    if mod(i,50) ~= 0
-        kalman2(:,i) = filt.x;
-        filt = Step(filt,u,transpose(accData(i,2)));
-    else
-        accData(i,2) = acc(i,2);
-        kalman2(:,i) = filt.x;
-        filt = Step(filt,u,accData(i,2));     
+%filt = Step(filt,imu_pos(1));
+%kalman(:,1) = filt.x;
+for i = 2:T
+    filt = Predict(filt, test_data_array(i,1));
+    if mod(i,100) == 0
+        filt = Step(filt,z_imu(i));
     end
-    
-    
-    
+    kalman(:,i) = filt.x;
 end
 
 
@@ -96,14 +104,15 @@ end
 figure
 t = 0:T-1;
 hold on 
-plot(t,acc(:,2))
-%plot(t,kalman1(1,:))
-plot(t,kalman2(1,:))
-plot(t,accData(:,2))
-legend('true','KF2','IMU')
+%plot(t,z_true)
+plot(t,kalman(1,:))
+%plot(t,z_imu)
+legend('KF')
 xlabel('Time')
 ylabel('Position')
 title('Kalman Filter 1D Position Correction')
+grid on
+box on
 hold off
 
 %% 2D
@@ -116,17 +125,25 @@ T = N;
 pos.delT = 1;
 pos.siga = 50;
 pos.sigp = 0.005;
-x = [2;0;0;0;0;0];
+x = [0;0;0;0;0;0];
 u = 1;
 kalman = zeros(6,T);
 
-[A,B,H,P,Q,R] = CreateFiltObj(pos);
-filt = SetKF(filt,x,A,B,H,P,Q,R);
+[A,B,H,P,Q,R,W] = CreateFiltObj(pos);
+filt = SetKF(filt,x,A,B,H,P,Q,R,W);
 
 for i = 1:T
     kalman(:,i) = filt.x;
     filt = Step(filt,u,[accData(i,1);accData(i,2)]);
 end
+
+% for i = 2:T
+%     filt = Predict(filt, accData(i,1));
+%     if mod(i,100) == 0
+%         filt = Step(filt,z_true(i));
+%     end
+%     kalman(:,i) = filt.x;
+% end
 
 figure
 t = 0:T-1;
