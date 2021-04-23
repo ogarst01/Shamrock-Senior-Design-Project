@@ -25,7 +25,7 @@ function [coords_vec,scale_factor] = wrapper_TRN(dateOfRun, framesPerSec)
     % count the number of files in the frames directory: 
     yourfolder = '/Users/Olive/Documents/MATLAB/seniorDesign/Shamrock-Senior-Design-Project/Data/frames';
     numPics = dir([yourfolder '/*.png']);
-    numPics = length(numPics)
+    numPics = length(numPics);
 
     global_map = imread(global_map_string);
 

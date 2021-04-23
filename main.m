@@ -134,13 +134,23 @@ if(runTRN)
     % TRN_coords_scaled = TRN_coords(:,end:-1:1,:);
     TRN_coords_scaled(:,1) = TRN_coords(:,1) + ((720/2)*scale_factor);
     TRN_coords_scaled(:,2) = TRN_coords(:,2) + ((1280/2)*scale_factor);
+    TRN_coords_scaled(:,3) = TRN_coords(:,3);
 else
+    % TODO - how to save this after running TRN? 
+    scale_factor = .33;
     % load the TRN data for that date and framesPerSec
     cd Data
     cd saved_TRN_outputs
     
     fileTRN = ['april',num2str(dateOfRun),'_trnOutput_',num2str(framesPerSec),'.mat'];
     
+    data = load(fileTRN);
+    TRN_coords_scaled = data.coords_vec;
+    
+    
+    TRN_coords_scaled(:,1) = TRN_coords_scaled(:,1) + ((720/2)*scale_factor);
+    TRN_coords_scaled(:,2) = TRN_coords_scaled(:,2) + ((1280/2)*scale_factor);
+    TRN_coords_scaled(:,3) = TRN_coords_scaled(:,3);
     cd ..
     cd ..
     
@@ -150,7 +160,7 @@ end
 figure(20)
 hold on, 
 imagesc(glob_map), 
-plot3(TRN_coords_scaled(:,1), TRN_coords_scaled(:,2),TRN_coords(:,3),'LineWidth',3,'Color','r'), 
+plot3(TRN_coords_scaled(:,1), TRN_coords_scaled(:,2),TRN_coords_scaled(:,3),'LineWidth',3,'Color','r') 
 plot3(TRN_coords_scaled(1,1),TRN_coords_scaled(1,2),0,'go','LineWidth',6)
 plot3(TRN_coords_scaled(end,1),TRN_coords_scaled(end,2),0,'bx','LineWidth',6)
 title('TRN coords over time'), 
@@ -160,32 +170,21 @@ xlabel('pixels'),
 hold off
 
 %% Lidar Processing
-% TODO: add the offset from camera to lidar data:
-
-% load the TRN coords: 
-cd Data
-cd saved_TRN_outputs
-
-TRN_coords = load('TRN_cord_april5_run.mat');
-TRN_coords = cell2mat(struct2cell(TRN_coords));
-cd ..
-cd ..
-%%
 
 % load the Lidar coords: 
 cd LidarMapping;
 
-m = 720;
-n = 1280;
-lidarMain(M,N, coords_vec, dateOfRun,glob_map)
-[hazardMapLidar,xq,yq,vq] = lidarMain(m,n, TRN_coords, dateOfRun,glob_map)
+M = 720;
+N = 1280;
+[hazardMapLidar,xq,yq,vq] = lidarMain(M,N, TRN_coords_scaled, dateOfRun,glob_map);
+%  = lidarMain(m,n, TRN_coords, dateOfRun,glob_map)
  
 cd ..
 
 % plot Lidar results:
 figure,
 subplot(2,1,1)
-imagesc(lidar_hazard_map')
+imagesc(hazardMapLidar')
 colorbar
 title('hazard map from Lidar data')
 ylabel('y pixels')
@@ -198,7 +197,11 @@ xlabel('x pixels')
 %% IMU Data Processing
 
 %% Kalman Filter 
+cd Kalman_Filter
 
+KF_main()
+
+cd ..
 %% Hazard Detection and Avoidance
 
 for j = 1:3

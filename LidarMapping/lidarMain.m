@@ -41,12 +41,13 @@ cd ..
 cd Data
 cd lidar_data
 
-Lidarfilename = ['april',dateOfRun];
+Lidarfilename = ['april',num2str(dateOfRun),'_run'];
 %Lidarfilename = 'april16_run';%DataRunFileName;
 [lidar_data, time_data] = processLidarData(Lidarfilename);
 
 lidar_data = lidar_data';
 
+cd ..
 cd ..
 %% doing some post processing:
 

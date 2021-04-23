@@ -37,16 +37,24 @@ glob_map = imread(glob_map_string_1);
 cd ..
 cd ..
 
+%% define whether certain elements in the pipeline have already been 
+% completed:
+grabFrames = 0;
+runTRN = 0;
+
 %% Video Processing: 
 framesPerSec = 5;
-% chose one to run: 
-% get frames video is for videos under 1 min: 
-numPics = GetFrames_Video(filename,framesPerSec);
+if(grabFrames == 1)
+    % get frames video is for videos under 1 min: 
+    % chose one to run: 
+    numPics = GetFrames_Video(filename,framesPerSec);
+    % longer vid case is for very long videos (over 1 min)
+    % no way to read how long the video is in matlab without error - human
+    % needed here to decide which to run
+    
+    % numPics = LongerVidCase(filename,framesPerSec);
+end
 
-% longer vid case is for very long videos (over 1 min)
-% no way to read how long the video is in matlab without error - human
-% needed here to decide which to run
-% numPics = LongerVidCase(filename,framesPerSec);
 
 %% Set up params struct
 
@@ -108,17 +116,57 @@ end
 %% TRN Coordinate Mapping:
 dateOfRun = 16;
 
-cd TRN
+if(runTRN)
+    cd TRN
 
-wrapper_TRN(dateOfRun, framesPerSec)
+    [TRN_coords,scale_factor] = wrapper_TRN(dateOfRun, framesPerSec);
 
-cd ..
+    cd ..
 
-% THIS PLOTS TRN OVER TIME - expected to show sweeps o:
-figure, hold on, 
-imagesc(global_map), 
-plot3(TRN_coords(:,2),TRN_coords(:,1), TRN_coords(:,3),'LineWidth',3,'Color','r'),
-plot(TRN_coords(1,2),TRN_coords(1,1),'gx','LineWidth',4),
+    % THIS PLOTS TRN OVER TIME - expected to show sweeps over set:
+    figure, hold on, 
+    imagesc(glob_map), 
+    plot3(TRN_coords(:,2),TRN_coords(:,1), TRN_coords(:,3),'LineWidth',3,'Color','r'),
+    plot(TRN_coords(1,2),TRN_coords(1,1),'gx','LineWidth',4),
+    hold off
+
+    % size is still the same as the global map:
+    % TRN_coords_scaled = TRN_coords(:,end:-1:1,:);
+    TRN_coords_scaled(:,1) = TRN_coords(:,1) + ((720/2)*scale_factor);
+    TRN_coords_scaled(:,2) = TRN_coords(:,2) + ((1280/2)*scale_factor);
+    TRN_coords_scaled(:,3) = TRN_coords(:,3);
+else
+    % TODO - how to save this after running TRN? 
+    scale_factor = .33;
+    % load the TRN data for that date and framesPerSec
+    cd Data
+    cd saved_TRN_outputs
+    
+    fileTRN = ['april',num2str(dateOfRun),'_trnOutput_',num2str(framesPerSec),'.mat'];
+    
+    data = load(fileTRN);
+    TRN_coords_scaled = data.coords_vec;
+    
+    
+    TRN_coords_scaled(:,1) = TRN_coords_scaled(:,1) + ((720/2)*scale_factor);
+    TRN_coords_scaled(:,2) = TRN_coords_scaled(:,2) + ((1280/2)*scale_factor);
+    TRN_coords_scaled(:,3) = TRN_coords_scaled(:,3);
+    cd ..
+    cd ..
+    
+    % TODO : assert what to do if file not found! 
+end
+
+figure(20)
+hold on, 
+imagesc(glob_map), 
+plot3(TRN_coords_scaled(:,1), TRN_coords_scaled(:,2),TRN_coords_scaled(:,3),'LineWidth',3,'Color','r') 
+plot3(TRN_coords_scaled(1,1),TRN_coords_scaled(1,2),0,'go','LineWidth',6)
+plot3(TRN_coords_scaled(end,1),TRN_coords_scaled(end,2),0,'bx','LineWidth',6)
+title('TRN coords over time'), 
+zlabel('time(seconds)'),
+ylabel('y pixels'),
+xlabel('pixels'),
 hold off
 
 %% Lidar Processing
@@ -128,8 +176,11 @@ hold off
 cd Data
 cd saved_TRN_outputs
 
+fileTRN = ['april',num2str(dateOfRun),'_trnOutput_',num2str(framesPerSec),'.mat'];
+
 TRN_coords = load('TRN_cord_april5_run.mat');
 TRN_coords = cell2mat(struct2cell(TRN_coords));
+
 cd ..
 cd ..
 %%
@@ -144,6 +195,19 @@ lidarMain(M,N, coords_vec, dateOfRun,glob_map)
  
 cd ..
 
+% plot Lidar results:
+figure,
+subplot(2,1,1)
+imagesc(lidar_hazard_map')
+colorbar
+title('hazard map from Lidar data')
+ylabel('y pixels')
+xlabel('x pixels')
+subplot(2,1,2)
+imagesc(flip(glob_map,2))
+title('global map from drone camera')
+ylabel('y pixels')
+xlabel('x pixels')
 %% IMU Data Processing
 
 %% Kalman Filter 
