@@ -26,7 +26,7 @@ addpath('ShadowBasedHazardDetection', 'HazardAvoidance','LidarMapping',genpath('
 % Read in photos from Video:
 % name of test run video:
 filename = 'april5_run1.MP4';
-
+IMU_data_file = '';
 dateOfRun = 16;
 
 % TODO: add global photos:

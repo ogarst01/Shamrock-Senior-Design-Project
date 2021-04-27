@@ -54,6 +54,8 @@ function KF_main()
     time_array = time_array(2:end,:);
     test_data_array = test_data_array(2:VIDEO_LENGTH,:); % 2:1030 hard coded for this data set. B/c end of video w/ some trash
 
+    
+
     figure
     plot(test_data_array)
     legend('y', 'z')

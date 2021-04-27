@@ -5,9 +5,9 @@
 % note that if NAN is displayed - the start message from the arduino is
 % being sent // that's the beginning of data being aquired...
 
-% function array = readingIMUData(filename)
+function array = readingIMUData(filename)
     % read in the data
-    filename= 'run1_march18'
+    % filename = 'run1_march18'
     f = fopen(filename);
     
     % throw an error if unopenable!
@@ -62,4 +62,4 @@
     
     fclose(f);
     array = array;
-% end
+end
