@@ -1,4 +1,4 @@
-function [time, coords] = TRN(global_map, local_map, time, prev_coord_x, prev_coord_y, framesPerSec)
+function [time, coords] = TRN(global_map, local_map, time, prev_coord_x, prev_coord_y, framesPerSec, set_size)
 
     local_map = imread(local_map);
     local_map = rescale(rgb2gray(local_map));
@@ -44,7 +44,11 @@ function [time, coords] = TRN(global_map, local_map, time, prev_coord_x, prev_co
     % find the max correlation == probably the location of drone at that
     % point:
     [row,col] = find(locationDiff == max(max(locationDiff)));
-
-    coords = [row, col];
+    % find the center pixel of the local map on the global map
+    pixel = [row, col];
+    % initialize the size of the set in meters
+    s = [0.0254*set_size(1), 0.0254*set_size(2)]; 
+    % convert to coordinates in meters
+    coords = pix2meters(pixel, s);
     time = time + 60*(1/framesPerSec);   % TODO: incorporate time when we have IMU measurements
 end

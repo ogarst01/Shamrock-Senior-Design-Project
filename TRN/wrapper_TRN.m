@@ -1,6 +1,6 @@
 function [coords_vec,scale_factor] = wrapper_TRN(dateOfRun, framesPerSec)
     
-
+    set_size = [24, 47.5];
     if(dateOfRun == 20)
         % april 20 run:
         global_map_string = 'global_april20.PNG';
@@ -52,7 +52,7 @@ function [coords_vec,scale_factor] = wrapper_TRN(dateOfRun, framesPerSec)
         coords_vec(i,3) = time;
         s = sprintf('%d',i);
         local_map = strcat('frame_', s, '.png');
-        [time, coords] = TRN(global_map, local_map, time, old_row, old_col,scale_factor,framesPerSec);
+        [time, coords] = TRN(global_map, local_map, time, old_row, old_col,scale_factor,framesPerSec, set_size);
         coords_vec(i,1:2) = coords;
         old_row = coords(1);
         old_col = coords(2);
@@ -79,7 +79,7 @@ function [coords_vec,scale_factor] = wrapper_TRN(dateOfRun, framesPerSec)
     figure,
     hold on
     imagesc(imread(global_map_string))
-    pllot3([coords_vec(:,2)'],[coords_vec(:,1)'],[coords_vec(:,3)'],'Color','r', 'LineWidth',4)
+    plot3([coords_vec(:,2)'],[coords_vec(:,1)'],[coords_vec(:,3)'],'Color','r', 'LineWidth',4)
     plot([coords_vec(1,2)'],[coords_vec(1,1)'],'gx')
     xlabel('x pixels')
     ylabel('y pixels')
