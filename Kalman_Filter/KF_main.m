@@ -1,7 +1,8 @@
 function KF_main()
     %% GLOBAL CONSTANTS: 
-    % VIDEO_LENGTH = 1030; % length of important usable frames from the videos
-
+    % April 5 = VIDEO_LENGTH = 1030; % length of important usable frames from the videos
+    % April 16 = VIDEO_LENGTH = 139 seconds * sample rate? -> 5 frames per
+    % sample... 
     %% Generate IMU Data
     %clear
     %close all
@@ -55,7 +56,10 @@ function KF_main()
 
     figure
     plot(test_data_array)
-    legend('y', 'z')
+    title('IMU data for april 16 run')
+    xlabel('time')
+    ylabel('acceleration')
+    legend('y IMU data', 'z IMU data')
 
     %% Load TRN Data
     cd ..
@@ -129,10 +133,12 @@ function KF_main()
     
     TRN_coord_x_2(:,1) = TRN_coord_m(:,1);%downsample(TRN_coord_m(:,1),5);
 
+    update_on = 10;
+    
     count = 1;
     for i = 2:T
         filt = Predict(filt, test_data_array(i,1));
-        if mod(i,100) == 0
+        if mod(i,update_on) == 0
             filt = Step(filt, TRN_coord_x_2(count,1));
             count = count + 1;
         end
@@ -178,24 +184,39 @@ function KF_main()
     [A,B,H,P,Q,R,W] = CreateFiltObj(pos);
     filt = SetKF(filt,x,A,B,H,P,Q,R,W);
 
+    RefreshRate_2d = 1;
 
     for i = 1:T
         filt = Predict(filt, test_data_array(i,:)');
-        if mod(i,100) == 0
-            filt = Step(filt,[z_imu_y(i); z_imu_z(i)]);
+        % TODO not sure this is working? 
+        count = 1;
+        
+        if mod(i,RefreshRate_2d) == 0
+            filt = Step(filt,[z_imu_y(count); z_imu_z(count)]);
+            count = count + 1;
         end
         kalman(:,i) = filt.x;
     end
     
+    li = linspace(0,max(t),length(TRN_coord_m));
+    
+    figure,
+    plot3(li,TRN_coord_m(:,1),TRN_coord_m(:,2))
+    
     figure
     t = 0:T-1;
+    
+    TRN_coord_m_plot(:,1) = TRN_coord_m(1:(length(kalman(1,:))),1);
+    TRN_coord_m_plot(:,2) = TRN_coord_m(1:(length(kalman(1,:))),2);
+
     hold on 
     %plot(t,z_true)
     plot3(t,kalman(1,:)',kalman(2,:)')
-    % plot3(t,accData(:,1), accData(:,2))
+    plot3(t,TRN_coord_m_plot(:,1),TRN_coord_m_plot(:,2))
+    plot3(t,z_imu_y, z_imu_z)
     %plot3(t,accData(:,1), accData(:,2))
     %plot(t,z_imu)
-    legend('true','KF2','IMU')
+    legend('KF2','TRN coords','IMU')
     xlabel('Time')
     ylabel('x pos')
     zlabel('y pos')
@@ -204,17 +225,21 @@ function KF_main()
     box on
     hold off
     
-    %%
-    figure
-    t = 0:T-1;
+    figure, 
     hold on 
-    plot3(t,acc(:,1),acc(:,2))
-    %plot(t,kalman1(1,:))
-    plot3(t,kalman(1,:)',kalman(2,:)')
-    plot3(t,accData(:,1), accData(:,2))
-    legend('true','KF2','IMU')
+    %plot(t,z_true)
+    % plot3(t,kalman(1,:)',kalman(2,:)')
+    plot3(t,TRN_coord_m_plot(:,1),TRN_coord_m_plot(:,2))
+    plot3(t,z_imu_y, z_imu_z)
+    %plot3(t,accData(:,1), accData(:,2))
+    %plot(t,z_imu)
+    legend('TRN coords','IMU')
     xlabel('Time')
     ylabel('x pos')
     zlabel('y pos')
     title('Kalman Filter 2D Position Correction')
+    grid on
+    box on
+    hold off
+    
 end
