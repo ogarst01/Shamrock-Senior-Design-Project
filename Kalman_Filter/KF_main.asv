@@ -1,6 +1,6 @@
 function KF_main()
     %% GLOBAL CONSTANTS: 
-    VIDEO_LENGTH = 1030; % length of important usable frames from the videos
+    % VIDEO_LENGTH = 1030; % length of important usable frames from the videos
 
     %% Generate IMU Data
     %clear
@@ -44,17 +44,14 @@ function KF_main()
     cd Data
     cd IMU_data
     
-    test_data_array = readingIMUData('april16_run');
-    time_array = linspace(0,length(test_data_array))
+    [time_array, test_data_array] = readingIMUData('april16_run');
     
     cd ..
     cd ..
     cd Kalman_Filter
  
     time_array = time_array(2:end,:);
-    test_data_array = test_data_array(2:VIDEO_LENGTH,:); % 2:1030 hard coded for this data set. B/c end of video w/ some trash
-
-    
+    % test_data_array = test_data_array(2:VIDEO_LENGTH,:); % 2:1030 hard coded for this data set. B/c end of video w/ some trash
 
     figure
     plot(test_data_array)
@@ -66,7 +63,7 @@ function KF_main()
     cd saved_run_data
     
     TRN_coords_pre = load('TRN_cord_april16_run2.mat');
-    TRN_coords = TRN_coords_pre.coords_vec_x;
+    TRN_coords = TRN_coords_pre.coords_vec;
 
     cd .. 
     cd ..
@@ -84,8 +81,8 @@ function KF_main()
     cx = x_meters/x_pix;
     cy = y_meters/y_pix; 
 
-    TRN_coord_m(:,1) = TRN_coords(:,4).*cx;
-    TRN_coord_m(:,2) = TRN_coords(:,5).*cy;
+    TRN_coord_m(:,1) = TRN_coords(:,1).*cx;
+    TRN_coord_m(:,2) = TRN_coords(:,2).*cy;
 
     %% Run filter 1D
 
@@ -126,8 +123,11 @@ function KF_main()
 
     %filt = Step(filt,imu_pos(1));
     %kalman(:,1) = filt.x;
-
-    TRN_coord_x_2(:,1) = downsample(TRN_coord_m(:,1),5);
+    
+    % if the data was taken about 1 measurement per IMU measurement:
+    % downsample by 1
+    
+    TRN_coord_x_2(:,1) = TRN_coord_m(:,1);%downsample(TRN_coord_m(:,1),5);
 
     count = 1;
     for i = 2:T
@@ -157,35 +157,51 @@ function KF_main()
     hold off
 
     %% 2D
-
     filt = KalmanFilter;
 
     pos = Position2D;
 
-    T = N;
-    pos.delT = 1;
-    pos.siga = 50;
-    pos.sigp = 0.005;
-    x = [0;0;0;0;0;0];
-    u = 1;
-    kalman = zeros(6,T);
+    T = length(test_data_array);
+    pos.delT = delT;
+    pos.siga = 0.5;
+    pos.sigp = 0.0005;
+    pos.sig_TRN = 0.5; % meters
+    x = [0;0;0;0];
+    kalman = zeros(4,T);
+
+    % z_imu_y = integrate_IMU(test_data_array(:,1),delT);
+    % z_imu_z = integrate_IMU(test_data_array(:,2),delT);
+
+    z_imu_y = test_data_array(:,1);
+    z_imu_z = test_data_array(:,2);
 
     [A,B,H,P,Q,R,W] = CreateFiltObj(pos);
     filt = SetKF(filt,x,A,B,H,P,Q,R,W);
 
+
     for i = 1:T
+        filt = Predict(filt, test_data_array(i,:)');
+        if mod(i,100) == 0
+            filt = Step(filt,[z_imu_y(i); z_imu_z(i)]);
+        end
         kalman(:,i) = filt.x;
-        filt = Step(filt,u,[accData(i,1);accData(i,2)]);
     end
-
-    % for i = 2:T
-    %     filt = Predict(filt, accData(i,1));
-    %     if mod(i,100) == 0
-    %         filt = Step(filt,z_true(i));
-    %     end
-    %     kalman(:,i) = filt.x;
-    % end
-
+    
+    figure
+    t = 0:T-1;
+    hold on 
+    %plot(t,z_true)
+    plot(t,kalman(1,:))
+    %plot(t,z_imu)
+    legend('KF')
+    xlabel('Time')
+    ylabel('Position')
+    title('Kalman Filter 1D Position Correction')
+    grid on
+    box on
+    hold off
+    
+    
     figure
     t = 0:T-1;
     hold on 
