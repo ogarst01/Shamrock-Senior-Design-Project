@@ -7,38 +7,10 @@ function KF_main()
     %clear
     %close all
 
-    N = 1000;
-    Fs = 100;
+    %N = 1000;
+    %Fs = 100;
     delT = 0.1;
-
-    params = accelparams('RandomWalk',[0.02 0.01 0.003]);
-
-    t = (0:(1/Fs):((N-1)/Fs))';
-    acc = zeros(N,3); 
-    angvel = zeros(N,3);
-    acc(:,1) = 0.2;
-    acc(:,2) = .5*t;
-    acc(:,3) = 0;
-
-    z_true = integrate_IMU(acc(:,1), 0.1);
-
-    IMU = imuSensor('SampleRate',Fs,'Accelerometer',params);
-
-    [accData, gyroData] = IMU(acc, angvel);
-
-    accData = -accData;
-
-
-    figure
-    plot3(angvel(:,1), angvel(:,2), angvel(:,3), '--', gyroData(:,1), gyroData(:,2), gyroData(:,3))
-    xlabel('x')
-    ylabel('y')
-    zlabel('z')
-    zlim([0 7])
-    title('Generated IMU Data')
-    legend('x (ground truth)', 'x (gyroscope)')
-
-
+    
     %% Load IMU Data
 
     cd ..
@@ -145,9 +117,6 @@ function KF_main()
         kalman(:,i) = filt.x;
     end
 
-
-
-
     figure
     t = 0:T-1;
     hold on 
@@ -161,7 +130,7 @@ function KF_main()
     grid on
     box on
     hold off
-
+    
     %% 2D
     filt = KalmanFilter;
 
@@ -178,13 +147,13 @@ function KF_main()
     % z_imu_y = integrate_IMU(test_data_array(:,1),delT);
     % z_imu_z = integrate_IMU(test_data_array(:,2),delT);
 
-    z_imu_y = test_data_array(:,1);
-    z_imu_z = test_data_array(:,2);
+    z_imu_y = test_data_array(:,1) - mean(test_data_array(:,1));
+    z_imu_z = test_data_array(:,2) - mean(test_data_array(:,2));
 
     [A,B,H,P,Q,R,W] = CreateFiltObj(pos);
     filt = SetKF(filt,x,A,B,H,P,Q,R,W);
 
-    RefreshRate_2d = 1;
+    RefreshRate_2d = 2;
 
     for i = 1:T
         filt = Predict(filt, test_data_array(i,:)');
@@ -209,14 +178,14 @@ function KF_main()
     TRN_coord_m_plot(:,1) = TRN_coord_m(1:(length(kalman(1,:))),1);
     TRN_coord_m_plot(:,2) = TRN_coord_m(1:(length(kalman(1,:))),2);
 
+    figure, 
     hold on 
-    %plot(t,z_true)
-    plot3(t,kalman(1,:)',kalman(2,:)')
-    plot3(t,TRN_coord_m_plot(:,1),TRN_coord_m_plot(:,2))
-    plot3(t,z_imu_y, z_imu_z)
+    plot(kalman(1,:)',kalman(2,:)','g')
+    plot(TRN_coord_m_plot(:,1),TRN_coord_m_plot(:,2))
+    %plot3(t,z_imu_y, z_imu_z)
     %plot3(t,accData(:,1), accData(:,2))
     %plot(t,z_imu)
-    legend('KF2','TRN coords','IMU')
+    %legend('KF2','TRN coords','IMU')
     xlabel('Time')
     ylabel('x pos')
     zlabel('y pos')
@@ -228,7 +197,7 @@ function KF_main()
     figure, 
     hold on 
     %plot(t,z_true)
-    % plot3(t,kalman(1,:)',kalman(2,:)')
+    plot3(t,kalman(1,:)',kalman(2,:)','g')
     plot3(t,TRN_coord_m_plot(:,1),TRN_coord_m_plot(:,2))
     plot3(t,z_imu_y, z_imu_z)
     %plot3(t,accData(:,1), accData(:,2))
