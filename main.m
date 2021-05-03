@@ -62,7 +62,7 @@ end
 params.smoothSigma = 2;
 params.shadowSizeThreshold = 100; %pixels
 params.sunVerticalAngle = 30;
-params.sunAzimuthAngle = 190;
+params.sunAzimuthAngle = 105;
 params.hazardHeightThreshold = 1; %pixels (TODO convert to m)
 params.landerFootprint = 10; %pixels (TODO convert to m?)
 
@@ -112,6 +112,9 @@ for i = 1:3
     cd frames;
 end
 
+cd ..
+cd ..
+
 
 %% TRN Coordinate Mapping:
 dateOfRun = 16;
@@ -157,17 +160,7 @@ else
     % TODO : assert what to do if file not found! 
 end
 
-figure(20)
-hold on, 
-imagesc(glob_map), 
-plot3(TRN_coords_scaled(:,1), TRN_coords_scaled(:,2),TRN_coords_scaled(:,3),'LineWidth',3,'Color','r') 
-plot3(TRN_coords_scaled(1,1),TRN_coords_scaled(1,2),0,'go','LineWidth',6)
-plot3(TRN_coords_scaled(end,1),TRN_coords_scaled(end,2),0,'bx','LineWidth',6)
-title('TRN coords over time'), 
-zlabel('time(seconds)'),
-ylabel('y pixels'),
-xlabel('pixels'),
-hold off
+animateTRN(glob_map, TRN_coords_scaled);
 
 %% Lidar Processing
 
