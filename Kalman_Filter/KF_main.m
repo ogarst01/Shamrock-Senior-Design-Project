@@ -59,13 +59,13 @@ function KF_main()
     cd ..
     cd Kalman_Filter
     
-    size = [46, 14];  %inches
-    size = size.*0.0254; % converts to meters
+    set_size = [46, 14];  %inches
+    set_size = set_size.*0.0254; % converts to meters
     % change pixel coords into meters first: 
     x_pix = 2720;
     y_pix = 1530;
-    x_meters = size(1);
-    y_meters = size(2);
+    x_meters = set_size(1);
+    y_meters = set_size(2);
  
     % Define conversion rate, number of pixels per meter
     cx = x_meters/x_pix;
