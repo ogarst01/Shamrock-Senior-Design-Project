@@ -38,6 +38,9 @@ function KF_main()
     % PLOTTING
     %       - position error and covariance (within 3 levels of covariance should always be within 3 levels)
     %       - 
+    
+    
+    % TRN - kai squared test (check against IMU data to throw out TRN outliers)
      %% Load IMU Data
  
     cd ..
@@ -200,7 +203,7 @@ function KF_main()
     [A,B,H,P,Q,R,W] = CreateFiltObj(pos);
     filt = SetKF(filt,x,A,B,H,P,Q,R,W);
  
-    RefreshRate_2d = 10;
+    RefreshRate_2d = 5;
     data_ratio = data_rate_TRN/data_rate_IMU * RefreshRate_2d;
  
     for i = 1:T
@@ -216,11 +219,12 @@ function KF_main()
     end
     
     
-    figure
+    %figure
     
     TRN_coord_m_plot(:,1) = downsample(TRN_coord_m(:,1),2);
     TRN_coord_m_plot(:,2) = downsample(TRN_coord_m(:,2),2);
  
+    figure,
     hold on 
     plot(kalman(1,:),kalman(2,:)) 
     plot(TRN_coord_m_plot(:,1),TRN_coord_m_plot(:,2))
