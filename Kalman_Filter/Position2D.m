@@ -14,10 +14,10 @@ classdef Position2D
                  0,        1, 0,          0;
                  0,        0, 1,   obj.delT;
                  0,        0, 0,         1];
-            B = [obj.delT^2/2, 0;
+            B = [obj.delT^2/2, 0; 
                  obj.delT,     0;
                  0,            obj.delT^2/2; 
-                 0,            obj.delT];
+                 0,            obj.delT]; % this is right  
             H = [1, 0, 0, 0;
                  0, 0, 1, 0];
             Q = [(obj.delT^4/4)*obj.sigp^2, (obj.delT^3/2)*obj.sigp^2,                         0,                         0;
@@ -26,8 +26,12 @@ classdef Position2D
                                          0,                         0, (obj.delT^3/2)*obj.sigp^2,     obj.delT^2*obj.sigp^2];
             
             R = obj.sig_TRN^2.*eye(2);
-            P = 1e-10*eye(4);
-            W = (obj.siga * obj.delT)^2;
+            P = [obj.sig_TRN^2, 0, 0, 0;
+                 0,           0.05, 0, 0;
+                 0,         0, obj.sig_TRN^2, 0;
+                 0,         0, 0, 0.05];
+            obj.sig_TRN^2.*eye(4);
+            W = (obj.siga^2)*eye(2);% * obj.delT)^2; % TODO - sigma^2 * eye(2)
         end
     end
 end

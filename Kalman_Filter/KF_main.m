@@ -11,6 +11,33 @@ function KF_main()
     %Fs = 100;
     delT = 0.1;
     
+    % signal_accel = 0.5
+    % TRN = 0.1
+    % sim = .005
+    % sig_accel_proc = 0.01; 
+   
+    % Tyler meeting notes: 
+    % TODO - add accel process noise - add to filter -> V add to Position2d
+    %      - = W + V (or increase W also would work)
+    % TODO - accel measurement noise shouldn't incluse delT
+    % TODO - -- change W from scalar in 2d to eye(2)
+    %      - measurement covariances needs to be 2x2
+    % TODO - get standard deviation from the standing still data to get the
+    % error in the filter
+     
+    % TODO - -- W = sigma^2 * eye(2)
+    % TODO - --changes the P naught to TRN sigma ^2 (was too small before)
+    
+    % TODO _ position uncertainty = TRN uncertainty, vel uncertainty should
+    % be diff. 
+    % TODO - -- specify Fs type thing 
+    
+    % NOTES - kronn functiont o make block diagonal matrices
+    %       - pn0 too small
+    %       - made intiailization classes ()not worth
+    % PLOTTING
+    %       - position error and covariance (within 3 levels of covariance should always be within 3 levels)
+    %       - 
      %% Load IMU Data
  
     cd ..
@@ -44,9 +71,9 @@ function KF_main()
     imu_pos(:,1) = integrate_IMU(test_data_array(:,1),0.1);
     imu_pos(:,2) = integrate_IMU(test_data_array(:,2),0.1);
     
+    figure,
     plot(imu_pos(:,1),imu_pos(:,2));
-    
-    
+    title('integrated IMU data')
     %% Load TRN Data
     cd ..
     cd TRN
@@ -195,9 +222,8 @@ function KF_main()
     TRN_coord_m_plot(:,2) = downsample(TRN_coord_m(:,2),2);
  
     hold on 
-    plot(kalman(1,:),kalman(2,:))
+    plot(kalman(1,:),kalman(2,:)) 
     plot(TRN_coord_m_plot(:,1),TRN_coord_m_plot(:,2))
- 
     legend('KF2','TRN coords')
     xlabel('x pos')
     ylabel('y pos')
