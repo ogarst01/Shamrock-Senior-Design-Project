@@ -64,7 +64,7 @@
         time_array(count,1) = time;
     end
     
-    array = array(1:2:end,2:3);
+    % array = array(1:2:end,2:3);
     time_array = time_array(1:2:end,:);
     
     
