@@ -174,14 +174,15 @@ else
     
     data = load(fileTRN);
     TRN_coords_scaled = data.coords_vec;
+    cd ../../TRN
+    TRN_coords_scaled = outlierReject(TRN_coords_scaled)
     
     
     TRN_coords_scaled(:,1) = TRN_coords_scaled(:,1) + ((720/2)*scale_factor);
     TRN_coords_scaled(:,2) = TRN_coords_scaled(:,2) + ((1280/2)*scale_factor);
     TRN_coords_scaled(:,3) = TRN_coords_scaled(:,3);
     cd ..
-    cd ..
-    
+
     % TODO : assert what to do if file not found! 
 end
 %%
