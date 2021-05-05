@@ -27,7 +27,6 @@ addpath('ShadowBasedHazardDetection', 'HazardAvoidance','LidarMapping',genpath('
 % name of test run video:
 filename = 'april5_run1.MP4';
 IMU_data_file = '';
-dateOfRun = 16;
 
 % TODO: add global photos:
 cd Data
@@ -36,6 +35,29 @@ glob_map_string_1 = 'april16_glob.PNG';
 glob_map = imread(glob_map_string_1);
 cd ..
 cd ..
+
+dateOfRun = 16;
+if(dateOfRun == 20)
+    % april 20 run:
+    global_map_string = 'global_april20.PNG';
+    local_height = 0.4;
+    global_height = 1.08;    
+elseif(dateOfRun == 16)
+    % april 16 run:
+    global_map_string = 'april5_global_from_.93m.png';
+    local_height = 0.3268;
+    global_height = .93;
+    % Amount to rotate for TRN:
+    rotate = 90;
+elseif(dateOfRun == 5)
+    % april 5 run: 
+    global_map_string = 'april5_global_from_.93m.png';
+    local_height = 0.33;
+    global_height = 0.98;   
+else
+    sprintf("ERROR - dates must be 5,16 or 20!")
+end
+
 
 %% define whether certain elements in the pipeline have already been 
 % completed:
@@ -76,44 +98,47 @@ params.smallRockDetectorThreshold = 65;
 params.showHDAOutput = true;
 
 %% Image Processing
-cd Data;
-cd frames;
-
-startName = 'frame_';
-endName   = '.png';
-endMatName = '.mat';
-
-%Todo - loop over all pics (i = 1:numPics). currently only doing a few for faster runs
-for i = 1:3
-    namePic = [startName, num2str(i), endName];
-
-    test_image = imread(namePic);
-    
-    %resize image for now for faster runs
-    test_image = imresize(test_image, 1/4);
-
-    %Perform shadow detection
-    shadow_hazard_map = shadowBasedDetectionWrapperAz(test_image, params, true);
-    
-    %Perform computer vision
-    cv_hazard_map = boulderDetectFunc(test_image, params);
-
-    cd ..
-    cd hazard_Maps;
-    
-    % save the data:
-    matName1 = [startName, num2str(i),  '_shadow', endMatName];
-    save(matName1,'shadow_hazard_map');
-    matName2 = [startName, num2str(i), '_cv', endMatName];
-    save(matName2, 'cv_hazard_map');
-    
-    
-    cd ..
+imagProc = 0;
+if(imagProc == 1)
+    cd Data;
     cd frames;
-end
 
-cd ..
-cd ..
+    startName = 'frame_';
+    endName   = '.png';
+    endMatName = '.mat';
+
+    %Todo - loop over all pics (i = 1:numPics). currently only doing a few for faster runs
+    for i = 1:3
+        namePic = [startName, num2str(i), endName];
+
+        test_image = imread(namePic);
+
+        %resize image for now for faster runs
+        test_image = imresize(test_image, 1/4);
+
+        %Perform shadow detection
+        shadow_hazard_map = shadowBasedDetectionWrapperAz(test_image, params, true);
+
+        %Perform computer vision
+        cv_hazard_map = boulderDetectFunc(test_image, params);
+
+        cd ..
+        cd hazard_Maps;
+
+        % save the data:
+        matName1 = [startName, num2str(i),  '_shadow', endMatName];
+        save(matName1,'shadow_hazard_map');
+        matName2 = [startName, num2str(i), '_cv', endMatName];
+        save(matName2, 'cv_hazard_map');
+
+
+        cd ..
+        cd frames;
+    end
+
+    cd ..
+    cd ..
+end
 
 
 %% TRN Coordinate Mapping:
@@ -159,7 +184,7 @@ else
     
     % TODO : assert what to do if file not found! 
 end
-
+%%
 animateTRN(glob_map, TRN_coords_scaled);
 
 %% Lidar Processing
@@ -174,6 +199,7 @@ N = 1280;
  
 cd ..
 
+%%
 % plot Lidar results:
 figure,
 subplot(2,1,1)

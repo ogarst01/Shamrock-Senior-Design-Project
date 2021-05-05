@@ -32,6 +32,12 @@ implemented?
 %}
 function [hazardMapLidar,xq,yq,vq] = lidarMain(M,N, coords_vec, dateOfRun,glob_map)
 %coords_vec = TRN_coords;
+
+% For debugging: 
+coords_vec = TRN_coords_scaled;
+M = 720;
+N = 1280;
+
 % dimensions of images coming in:
 [xImg, yImg] = size(glob_map);
 
@@ -73,6 +79,33 @@ Xs = coords_vec(:,1);
 Ys = coords_vec(:,2);
 Zs = lidar_data;
 
+if(length(Zs) > length(Xs))
+    Zs = Zs(1:(length(Xs)));
+elseif(length(Zs) < length(Xs))
+    Xs = Xs(1:length(Zs));
+    Ys = Ys(1:length(Zs));
+end
+%%
+c = 1:20;
+
+figure,
+cmp=jet(numel(Zs));
+scatter3(Xs,Ys,Zs',10,Zs','filled');%,15, cmp,'filled');
+colormap(jet);
+colorbar;
+axis([0, 1280, 0, 720])  
+xlabel('x locations')
+ylabel('y locations')
+zlabel('set height')
+title('normalized Lidar point map')
+%colormap
+
+%%
+% USE TRN coords for now: 
+Xs = coords_vec(:,1);
+Ys = coords_vec(:,2);
+Zs = lidar_data;
+
 % add data to the four corners to make sure that the entire area is
 % covered: 
 xCornersTop    = linspace(0, 1280, 100)';
@@ -99,7 +132,7 @@ CyCornersLeft   = linspace(0,720,100)';
 
 xCorners = [xCorners; CxCornersTop; CxCornersBottom; CxCornersRights; CxCornersLeft];
 yCorners = [yCorners; CyCornersTop; CyCornersBottom; CyCornersRights; CyCornersLeft];
-zCorners = ones(800,1);
+zCorners = mean(lidar_data).*ones(800,1);
 
 Xs = [Xs;xCorners];
 Ys = [Ys;yCorners];
@@ -127,7 +160,7 @@ colorbar
 % Interpolater part: 
 x = Xs;
 y = Ys;
-z = Zs;
+z = 1 - Zs;
 
 [xq,yq] = meshgrid(0:1:(1280-1), 0:1:(720-1));
 vq = griddata(x,y,z,xq,yq);
@@ -135,17 +168,46 @@ vq = griddata(x,y,z,xq,yq);
 figure
 mesh(xq,yq,vq)
 hold on
+plot3(1180,500,-1,'o','LineWidth',5,'Color','g')
+plot3(180,220,-1,'o','LineWidth',5,'Color','r')
 plot3(x,y,z,'o')
-title('interpolated lidar plot')
+%plot3(x(length(x)),y(length(x)),z(length(x)),'x','LineWidth',5,'Color','g')
+%plot3(x(0),y(length(x)),z(length(x)),'x','LineWidth',5,'Color','g')
+legend('mesh for lidar','first Lidar point','last Lidar point (big rock!)');
+%title('interpolated lidar plot')
+ylim([200,500])
 xlabel('x pixels')
 ylabel('y pixels')
 zlabel('lidar interpolated height data')
 hold off
 
+figure,
+imagesc(imrotate(glob_map,90))
+%%
+% make the hazard map:
+threshold = 0.7;
+newmatrix = vq;
+newmatrix(vq < threshold) = 0;
+newmatrix(vq >= threshold) = 1;
+
+% plot the results:
+figure,
+hold on
+mesh(xq,yq,newmatrix)
+plot3(1180,500,-1,'o','LineWidth',5,'Color','g')
+plot3(180,220,-1,'o','LineWidth',5,'Color','r')
+title('Lidar hazard map: 1 = hazard, 0 = safe')
+colorbar
+ylabel('y pixels')
+xlabel('x pixels')
+hold off
+%%
+figure, 
+plot(newmatrix)
 %%
 % initialize: 
 hazardMapLidar = zeros(720,1280);
-meanVal = mean(lidar_data(:));
+meanVal = 0.5;%mean(lidar_data(:));
 
 for i = 1:(720-1)
     for j = 1:(1280-1)

@@ -5,19 +5,23 @@ function [coords_vec,scale_factor] = wrapper_TRN(dateOfRun, framesPerSec)
         % april 20 run:
         global_map_string = 'global_april20.PNG';
         local_height = 0.4;
-        global_height = 1.08;    
+        global_height = 1.08;  
+        rotate = 0;
     elseif(dateOfRun == 16)
         % april 16 run:
         global_map_string = 'april5_global_from_.93m.png';
         local_height = 0.3268;
         global_height = .93;
+        rotate = 90;
     elseif(dateOfRun == 5)
         % april 5 run: 
         global_map_string = 'april5_global_from_.93m.png';
         local_height = 0.33;
-        global_height = 0.98;   
+        global_height = 0.98; 
+        rotate = 0;
     else
         sprintf("ERROR - dates must be 5,16 or 20!")
+        return;
     end
 
     scale_factor = local_height/global_height;
@@ -28,7 +32,8 @@ function [coords_vec,scale_factor] = wrapper_TRN(dateOfRun, framesPerSec)
     numPics = length(numPics);
 
     global_map = imread(global_map_string);
-
+    global_map = imrotate(global_map,rotate);
+        
     figure,
     imagesc(global_map);
     title('global map')
