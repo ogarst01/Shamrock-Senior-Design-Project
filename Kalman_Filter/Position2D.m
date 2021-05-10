@@ -30,7 +30,7 @@ classdef Position2D
                  0,           0.05, 0, 0;
                  0,         0, obj.sig_TRN^2, 0;
                  0,         0, 0, 0.05];
-            obj.sig_TRN^2*eye(4);
+            obj.sig_TRN^2.*eye(4);
             W = (obj.siga^2)*eye(2);% * obj.delT)^2; % TODO - sigma^2 * eye(2)
         end
     end
