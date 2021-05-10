@@ -55,17 +55,17 @@
         % grab the time in seconds: 
         time = (minutes*60) + (seconds) + (mseconds);
         
-        count = count + 1
+        count = count + 1;
         
         % lidar data:
         array(count,:) = accel_vec;
         
         % in seconds:
-        time_array(count,1) = time;
+        time_array(count) = time;
     end
     
-    % array = array(1:2:end,2:3);
-    time_array = time_array(1:2:end,:);
+    array = array(:,2:3);
+    %time_array = time_array(1:2:end,:);
     
     
     fclose(f);
