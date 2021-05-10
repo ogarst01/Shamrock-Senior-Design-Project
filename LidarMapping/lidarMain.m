@@ -34,9 +34,9 @@ function [hazardMapLidar,xq,yq,vq] = lidarMain(M,N, coords_vec, dateOfRun,glob_m
 %coords_vec = TRN_coords;
 
 % For debugging: 
-coords_vec = TRN_coords_scaled;
-M = 720;
-N = 1280;
+% coords_vec = TRN_coords_scaled;
+% M = 720;
+% N = 1280;
 
 % dimensions of images coming in:
 [xImg, yImg] = size(glob_map);

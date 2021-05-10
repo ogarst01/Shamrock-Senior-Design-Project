@@ -143,7 +143,7 @@ end
 
 %% TRN Coordinate Mapping:
 dateOfRun = 16;
-
+runTRN = 0;
 if(runTRN)
     cd TRN
 
@@ -187,8 +187,7 @@ else
 end
 %%
 animateTRN(glob_map, TRN_coords_scaled);
-
-%% Lidar Processing
+%% Now that have coordinate system => Lidar Processing
 
 % load the Lidar coords: 
 cd LidarMapping;
@@ -222,6 +221,7 @@ cd Kalman_Filter
 KF_main()
 
 cd ..
+
 %% Hazard Detection and Avoidance
 
 for j = 1:3
