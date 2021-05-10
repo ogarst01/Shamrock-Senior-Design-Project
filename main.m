@@ -61,7 +61,7 @@ end
 
 %% define whether certain elements in the pipeline have already been 
 % completed:
-grabFrames = 0;
+grabFrames = 1;
 runTRN = 0;
 
 %% Video Processing: 
@@ -98,7 +98,7 @@ params.smallRockDetectorThreshold = 65;
 params.showHDAOutput = true;
 
 %% Image Processing
-imagProc = 0;
+imagProc = 1;
 if(imagProc == 1)
     cd Data;
     cd frames;
@@ -195,6 +195,7 @@ cd LidarMapping;
 M = 720;
 N = 1280;
 [hazardMapLidar,xq,yq,vq] = lidarMain(M,N, TRN_coords_scaled, dateOfRun,glob_map);
+hazardMapLidar = ones(size(hazardMapLidar)) - hazardMapLidar;
 %  = lidarMain(m,n, TRN_coords, dateOfRun,glob_map)
  
 cd ..
@@ -216,14 +217,14 @@ xlabel('x pixels')
 %% IMU Data Processing
 
 %% Kalman Filter 
-cd Kalman_Filter
+%cd Kalman_Filter
 
-KF_main()
+%KF_main()
 
-cd ..
+%cd ..
 
 %% Hazard Detection and Avoidance
-
+[lidarX, lidarY] = size(hazardMapLidar);
 for j = 1:3
     %load data
     shadow_hazard = load([startName, num2str(j), '_shadow', endMatName]);
@@ -231,9 +232,67 @@ for j = 1:3
     cv_hazard = load([startName, num2str(j), '_cv', endMatName]);
     cv_hazard_map = cv_hazard.cv_hazard_map;
     
+    %take frame of lidar map
+    this_coord = TRN_coords_scaled(j,1:2);
+    width_x = lidarX * scale_factor;
+    width_y = lidarY * scale_factor;
+    start_x = round(this_coord(1) - width_x / 2);
+    if start_x < 1
+        start_x = 1;
+    end
+    finish_x = round(this_coord(1) + width_x / 2);
+    if finish_x > lidarX
+        finish_x = lidarX;
+    end
+    start_y = round(this_coord(2) - width_y / 2);
+    if start_y < 1
+        start_y = 1;
+    end
+    finish_y = round(this_coord(2) + width_y / 2);
+    if finish_y > lidarY
+        finish_y = lidarY;
+    end
+    this_frame = hazardMapLidar(start_x:finish_x, start_y:finish_y);
+    lidar_hazard_map = imresize(this_frame, [180, 320]);
+    %{
+    figure,
+    subplot(2,1,1)
+    imagesc(hazardMapLidar')
+    colorbar
+    title('hazard map from Lidar data')
+    ylabel('y pixels')
+    xlabel('x pixels')
+    hold on
+    plot(this_coord(1), this_coord(2), 'r+')
+    hold off
+    subplot(2,1,2)
+    imagesc(lidar_hazard_map')
+    colorbar
+    title('saved frame')
+    ylabel('y pixels')
+    xlabel('x pixels')
+    %}
+    
     %Combine hazard maps w/ logical OR
-    hazard_map = shadow_hazard_map | cv_hazard_map;
+    hazard_map = shadow_hazard_map | cv_hazard_map | lidar_hazard_map;
 
+    %display combination of hazard maps
+    figure
+    subplot(2,2,1)
+    imagesc(shadow_hazard_map)
+    colorbar
+    subplot(2,2,2)
+    imagesc(cv_hazard_map)
+    colorbar
+    subplot(2,2,3)
+    imagesc(lidar_hazard_map)
+    colorbar
+    subplot(2,2,4)
+    imagesc(hazard_map)
+    colorbar
+    
+    
+    
     %Run HDA algorithm
     HDAWrapper(hazard_map, params);
 end
