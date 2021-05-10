@@ -19,22 +19,34 @@
     count = 0;
     C = textscan(f, '%f');
     % while not the end of the file, keep reading: 
+    
     while ~feof(f)
         tline = fgetl(f);
-
-        minutes = str2double(tline(4:5));
-        %minutes = str2double(minutes);
-        seconds = str2double(tline(7:8));
-        %seconds = str2double(seconds);
-        mseconds = str2double(tline(9:12));
-        %mseconds = str2double(mseconds);
-
         
-        char = tline(21:end);
-        char = regexprep(char, 'Y:', ' ');
-        char = regexprep(char, 'Z:', ' ');
-        accel_vec = sscanf(char,'%f');
+        % check for end of line:
+        if(length(tline) < 4)
+            break;
+        end
         
+        if(count == 0)
+            % :31:39.070 -> A X: -9.4421  Y: -0.9811  Z: 1.8760  m/s^2
+            minutes = str2double(tline(1:2));
+            seconds = str2double(tline(4:5));
+            mseconds = str2double(tline(7:9));
+            char = tline(21:end);
+            char = regexprep(char, 'Y:', ' ');
+            char = regexprep(char, 'Z:', ' ');
+            accel_vec = sscanf(char,'%f');            
+        else
+            minutes = str2double(tline(4:5));
+            seconds = str2double(tline(7:8));
+            mseconds = str2double(tline(9:12));
+
+            char = tline(21:end);
+            char = regexprep(char, 'Y:', ' ');
+            char = regexprep(char, 'Z:', ' ');
+            accel_vec = sscanf(char,'%f');
+        end
 %         accel_x = str2double(tline(22:27));
 %         accel_y = str2double(tline(33:38));
 %         % grab lidar measurements: 
@@ -49,11 +61,11 @@
         array(count,:) = accel_vec;
         
         % in seconds:
-        time_array(count,1) = time;
+        time_array(count) = time;
     end
     
-    array = array(1:2:end,2:3);
-    time_array = time_array(1:2:end,:);
+    array = array(:,2:3);
+    %time_array = time_array(1:2:end,:);
     
     
     fclose(f);

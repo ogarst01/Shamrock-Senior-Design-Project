@@ -56,7 +56,7 @@ function KF_main()
     cd ..
     cd Kalman_Filter
  
-    time_array = time_array(2:end,:);
+    %time_array = time_array(2:end,:);
     % test_data_array = test_data_array(2:VIDEO_LENGTH,:); % 2:1030 hard coded for this data set. B/c end of video w/ some trash
  
     figure
@@ -191,6 +191,8 @@ function KF_main()
     pos.siga = 0.5;
     pos.sigp = 0.0005;
     pos.sig_TRN = 0.5; % meters
+    pos.siga_proc = 1;
+   
     x = [0;0;0;0];
     kalman = zeros(4,T);
  
@@ -203,7 +205,7 @@ function KF_main()
     [A,B,H,P,Q,R,W] = CreateFiltObj(pos);
     filt = SetKF(filt,x,A,B,H,P,Q,R,W);
  
-    RefreshRate_2d = 5;
+    RefreshRate_2d = 10;
     data_ratio = data_rate_TRN/data_rate_IMU * RefreshRate_2d;
  
     for i = 1:T
@@ -216,6 +218,8 @@ function KF_main()
             count = count + 1;
         end
         kalman(:,i) = filt.x;
+        xHist(:,i) = filt.x;
+        PHist(:,:,i) = filt.P;
     end
     
     
@@ -253,4 +257,24 @@ function KF_main()
 %     box on
 %     hold off
 %     
+
+%%
+
+set(0,'defaultAxesBox','on');
+set(0,'defaultAxesXGrid','on')
+set(0,'defaultAxesYGrid','on')
+set(0,'defaultLineLinewidth', 1.5)
+set(0,'defaultLineMarkersize', 20);
+set(0,'defaultFigureWindowStyle', 'Docked')
+
+
+%% Plotting
+close all
+%plotIMU(t_imu, accel_data.', true)
+%plotTRN(t_TRN, TRN_coord_m.')
+plotKFOutputs(time_array, xHist, PHist)
+
+
+
+
 end
