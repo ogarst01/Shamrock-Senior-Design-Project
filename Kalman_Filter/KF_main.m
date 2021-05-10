@@ -3,18 +3,16 @@ function KF_main()
     clear
     close all
  
-    N = 1000;
-    Fs = 100;
-    delT = 0.1;
-    
-    data_rate_IMU = 10;
-    data_rate_TRN = 5;
-    
+    % position/IMU kf params
     delT = 0.1;
     siga = 0.5;
     sigp = 0.0005;
     sig_TRN = 0.5; % meters
     siga_proc = 1;
+    
+    % refresh rate params
+    data_rate_IMU = 10;
+    data_rate_TRN = 5;
     RefreshRate_2d = 10;
    
     
@@ -26,6 +24,7 @@ function KF_main()
     
     [time_array, test_data_array] = readingIMUData('april16_run');
     
+    % normalize IMU data
     test_data_array(:,1) = test_data_array(:,1) - mean(test_data_array(:,1));
     test_data_array(:,2) = test_data_array(:,2) - mean(test_data_array(:,2));
     
@@ -70,10 +69,12 @@ function KF_main()
     
     
     %% 2D
+    
+    % create classes
     filt = KalmanFilter;
- 
     pos = Position2D;
  
+    % define position class params
     T = length(test_data_array);
     pos.delT = delT;
     pos.siga = siga;
@@ -81,14 +82,18 @@ function KF_main()
     pos.sig_TRN = sig_TRN; % meters
     pos.siga_proc = siga_proc;
    
-    x = [0;0;0;0];
+    % initial x estimate (april 16th data)
+    x = [0.5120;0;0.1229;0];
     kalman = zeros(4,T);
 
+    % create the KF
     [A,B,H,P,Q,R,W] = CreateFiltObj(pos);
     filt = SetKF(filt,x,A,B,H,P,Q,R,W);
  
+    % find data ratio
     data_ratio = data_rate_TRN/data_rate_IMU * RefreshRate_2d;
  
+    % run KF on IMU with TRN updates
     for i = 1:T
         filt = Predict(filt, test_data_array(i,:)'); 
         count = 1;
@@ -101,40 +106,23 @@ function KF_main()
         xHist(:,i) = filt.x;
         PHist(:,:,i) = filt.P;
     end
-    
-    
-    %figure
-    
-    TRN_coord_m_plot(:,1) = downsample(TRN_coord_m(:,1),2);
-    TRN_coord_m_plot(:,2) = downsample(TRN_coord_m(:,2),2);
- 
-    figure,
-    hold on 
-    plot(kalman(1,:),kalman(2,:)) 
-    plot(TRN_coord_m_plot(:,1),TRN_coord_m_plot(:,2))
-    legend('KF2','TRN coords')
-    xlabel('x pos')
-    ylabel('y pos')
-    title('Kalman Filter 2D Position Correction')
-    grid on
-    box on
-    hold off   
 
-%%
+    %% Plot Settings
 
-set(0,'defaultAxesBox','on');
-set(0,'defaultAxesXGrid','on')
-set(0,'defaultAxesYGrid','on')
-set(0,'defaultLineLinewidth', 1.5)
-set(0,'defaultLineMarkersize', 20);
-set(0,'defaultFigureWindowStyle', 'Docked')
+    set(0,'defaultAxesBox','on');
+    set(0,'defaultAxesXGrid','on')
+    set(0,'defaultAxesYGrid','on')
+    set(0,'defaultLineLinewidth', 1.5)
+    set(0,'defaultLineMarkersize', 20);
+    set(0,'defaultFigureWindowStyle', 'Docked')
 
 
-%% Plotting
-close all
-%plotIMU(t_imu, accel_data.', true)
-%plotTRN(t_TRN, TRN_coord_m.')
-plotKFOutputs(time_array, xHist, PHist)
+    %% Plotting
+
+    close all
+    %plotIMU(t_imu, accel_data.', true)
+    %plotTRN(t_TRN, TRN_coord_m.')
+    plotKFOutputs(time_array, xHist, PHist)
 
 
 
