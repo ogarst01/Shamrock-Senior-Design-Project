@@ -14,53 +14,44 @@ function hazardMap = boulderDetectFunc(testImage, params)
 load(params.boulderDetectorString)
 load(params.smallRockDetectorString)
 
-thresholdB = params.boulderDetectorThreshold;
-thresholdSR = params.smallRockDetectorThreshold;
-
-img = testImage;
-
-[bboxesBoulder,scoresBoulder] = detect(acfBoulderDetector,img);
-[bboxesSR,scoresSR] = detect(acfSRDetector,img);
-
-tempimg = img;
-for i = 1:length(scoresBoulder)
-    if(scoresBoulder(i) > thresholdB)
-        annotation = sprintf('Boulder: Confidence = %.1f',scoresBoulder(i));
-        tempimg = insertObjectAnnotation(tempimg,'rectangle',bboxesBoulder(i,:),annotation);
-    end
-end
-
-for i = 1:length(scoresSR)
-    if(scoresSR(i) > thresholdSR)
-        
-        annotation = sprintf('SmallRock: Confidence = %.1f',scoresSR(i));
-        tempimg = insertObjectAnnotation(tempimg,'rectangle',bboxesSR(i,:),annotation);
-    end
-end
-
-figure
-imshow(tempimg)
-
-% Create Hazard Map
-[w,l,~] = size(img);
-hazardMap = zeros(w,l);
-
-for i = 1:length(scoresBoulder)
-    if(scoresBoulder(i) > thresholdB)
-        currbbox(1,:) = bboxesBoulder(i,:);
-        hazardMap(currbbox(2):currbbox(2)+currbbox(4),currbbox(1):currbbox(1)+currbbox(3)) = 1;
-    end
-end
-
-for i = 1:length(scoresSR)
-    if(scoresSR(i) > thresholdSR)
-        currbbox(1,:) = bboxesSR(i,:);
-        hazardMap(currbbox(2):currbbox(2)+currbbox(4),currbbox(1):currbbox(1)+currbbox(3)) = 2;
-    end
-end
+img_lab = rgb2lab(testImage);
 
 
-%%image(hazardMap);
+max_luminosity = 100;
+L = img_lab(:,:,1)/max_luminosity;
 
 
+img_imadjust = img_lab;
+img_imadjust(:,:,1) = imadjust(L)*max_luminosity;
+img_imadjust = lab2rgb(img_imadjust);
+
+img_histeq = img_lab;
+img_histeq(:,:,1) = histeq(L)*max_luminosity;
+img_histeq = lab2rgb(img_histeq);
+img_adapthisteq = img_lab;
+img_adapthisteq(:,:,1) = adapthisteq(L)*max_luminosity;
+img_adapthisteq = lab2rgb(img_adapthisteq);
+
+%montage({X,img_imadjust,img_histeq,img_adapthisteq},'Size',[1,4]);
+
+[w,l,~] = size(testImage);
+hmap = zeros(w,l);
+
+h1 = getHazardMap(testImage,params,.7,.7,hmap);
+% figure();
+% imshow(tmp1);
+
+h2 = getHazardMap(img_imadjust,params,.7,.7,h1);
+% figure();
+% imshow(tmp2);
+
+h3 = getHazardMap(img_histeq,params,.87,.87,h2);
+% figure();
+% imshow(tmp3);
+
+h4 = getHazardMap(img_adapthisteq,params,.87,.9,h3);
+% figure();
+% imshow(tmp4);
+
+hazardMap = (h4>2);
 end
