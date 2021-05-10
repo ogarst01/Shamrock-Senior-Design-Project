@@ -2,7 +2,6 @@ cd Data
 cd global_data
 glob_map = imread('april16_glob.PNG');
 ground_truth = imread('april16_glob_for_truth_data.PNG');
-
 cd ..
 cd ..
 
