@@ -1,0 +1,10 @@
+00:12 turns right
+00:28 turns left
+00:42 turns right
+01:00 turns left
+01:16 turns right
+01:28 turns left
+01:37 turns right 
+01:46 turns left
+01:58 tufts right
+02:09 tufts left

@@ -16,8 +16,10 @@ load(params.smallRockDetectorString)
 
 img_lab = rgb2lab(testImage);
 
+
 max_luminosity = 100;
 L = img_lab(:,:,1)/max_luminosity;
+
 
 img_imadjust = img_lab;
 img_imadjust(:,:,1) = imadjust(L)*max_luminosity;
