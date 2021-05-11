@@ -1,5 +1,15 @@
 classdef Position2D
     %POSITION2D create position tracking matrices in 2 dimensions to feed Kalman Filter
+%     
+%     A: State transition matrix
+%     B: Control matrix
+%     H: Observation matrix
+%     x: Initial state estimate
+%     P: Initial covariance estimate
+%     Q: Covariance noise
+%     R: Sensor covariance
+%     W: accelerometer noise
+%     
     
     properties
         delT         % Time step
@@ -11,7 +21,7 @@ classdef Position2D
     
     methods
         function [A,B,H,P,Q,R,W,V] = CreateFiltObj(obj)
-            A = [0, obj.delT, 0,          0;
+            A = [1, obj.delT, 0,          0;
                  0,        1, 0,          0;
                  0,        0, 1,   obj.delT;
                  0,        0, 0,         1];

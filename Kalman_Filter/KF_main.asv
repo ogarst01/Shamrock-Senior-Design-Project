@@ -2,7 +2,6 @@ function KF_main()
     %% Parameters
     clear
     close all
-    clc
  
     % position/IMU kf params
     delT = 0.1;
@@ -84,7 +83,7 @@ function KF_main()
     pos.siga_proc = siga_proc;
    
     % initial x estimate (april 16th data)
-    x = [TRN_coord_m(1,1);0;TRN_coord_m(1,2);0];
+    x = [0.5120;0;0.1229;0];
     kalman = zeros(4,T);
 
     % create the KF
@@ -125,8 +124,8 @@ function KF_main()
     plotKFOutputs(time_array, xHist, PHist)
 
     figure
-    plot(xHist(1,:),xHist(3,:))
-    
+    hold on
+    plot(xHist(1
     
     
     
