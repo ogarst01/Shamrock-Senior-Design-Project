@@ -8,7 +8,7 @@ function KF_main()
     delT = 0.1;
     siga = 0.5;
     sigp = 0.0005;
-    sig_TRN = 0.002; % meters
+    sig_TRN = 0.2; % meters
     siga_proc = 1;
     
     % refresh rate params
@@ -19,19 +19,12 @@ function KF_main()
     
      %% Load IMU Data
  
-    cd ..
-    cd Data
-    cd IMU_data
-    
-    [time_array, test_data_array] = readingIMUData('april16_run');
+    addpath(genpath(fullfile('..','Data')));
+    [time_array, test_data_array] = readingIMUData(fullfile('..','Data','IMU_Data','april16_run'));
     
     % normalize IMU data
     test_data_array(:,1) = test_data_array(:,1) - mean(test_data_array(:,1));
     test_data_array(:,2) = test_data_array(:,2) - mean(test_data_array(:,2));
-    
-    cd ..
-    cd ..
-    cd Kalman_Filter
  
     figure
     plot(test_data_array)
@@ -42,17 +35,11 @@ function KF_main()
     
    
     %% Load TRN Data
-    cd ..
-    cd TRN
-    cd saved_run_data
     
-    TRN_coords_pre = load('TRN_cord_april16_run2.mat');
+    addpath(genpath(fullfile('..','Data')));
+    TRN_coords_pre = load(fullfile('..','TRN','saved_run_data','TRN_cord_april16_run2.mat'));
     TRN_coords = TRN_coords_pre.coords_vec;
  
-    cd .. 
-    cd ..
-    cd Kalman_Filter
-    
     set_size = [46, 14];  %inches
     set_size = set_size.*0.0254; % converts to meters
     % change pixel coords into meters first: 

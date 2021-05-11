@@ -44,9 +44,8 @@ end
 
 for k=1:2
     figure('name', sprintf('%s Error vs Time', c2{k}))
-    istart = -1 + 2*k;
     for i=1:2
-        ind = istart + (i-1);
+        ind = k + (i-1)*2;
         subplot(2, 1, i)
         hold on
         if plot_truth
