@@ -30,7 +30,8 @@ bound_idx = findBoundaries(hazard_image, false, []);
 
 %Plot boundaries of hazard and shadow on top of original image
 figure
-imshow(origImage)
+imagesc(origImage)
+%imshow(origImage)
 hold on
 plot(shadowBoundaries(:,1), shadowBoundaries(:,2), '.r', 'MarkerSize', 3)
 if bound_row > 0

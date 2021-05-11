@@ -1,7 +1,7 @@
 %{
 Senior Design
 Team Shamrock
-last updated: 3/10/2021
+last updated: 5/11/2021
 
 main.m
 
@@ -23,20 +23,14 @@ TODO:
 % Add paths to source code for each feature
 
 addpath('ShadowBasedHazardDetection', 'HazardAvoidance','LidarMapping',genpath('Data'), genpath('ComputerVision'))
-addpath('Data', 'Data/lidar_data','Data/global_data','Data/frames')
+addpath('Data/lidar_data','Data/global_data','Data/frames','Data/global_data')
+addpath('ComputerVision/BoulderDetect')
 
 % Read in photos from Video:
 % name of test run video:
-filename = 'april5_run1.MP4';
 IMU_data_file = '';
-
-% TODO: add global photos:
-cd Data
-cd global_data
 glob_map_string_1 = 'april16_glob.PNG';
 glob_map = imread(glob_map_string_1);
-cd ..
-cd ..
 
 dateOfRun = 16;
 if(dateOfRun == 20)
@@ -45,6 +39,7 @@ if(dateOfRun == 20)
     local_height = 0.4;
     global_height = 1.08;    
 elseif(dateOfRun == 16)
+    filename = 'april16_run.MP4';
     % april 16 run:
     global_map_string = 'april5_global_from_.93m.png';
     local_height = 0.3268;
@@ -63,20 +58,31 @@ end
 
 %% define whether certain elements in the pipeline have already been 
 % completed:
-grabFrames = 1;
+grabFrames = 0;
 runTRN = 0;
 
 %% Video Processing: 
-framesPerSec = 5;
+% framesPerSec = 5;
+framesPerSec = 1;
+
+filenames = ["april16_firstMin.mp4", "april16_secondMin.mp4"];
+numVids = length(filenames);
+
 if(grabFrames == 1)
     % get frames video is for videos under 1 min: 
     % chose one to run: 
-    numPics = GetFrames_Video(filename,framesPerSec);
+    % numPics = GetFrames_Video(filename,framesPerSec);
+    
     % longer vid case is for very long videos (over 1 min)
     % no way to read how long the video is in matlab without error - human
     % needed here to decide which to run
     
-    % numPics = LongerVidCase(filename,framesPerSec);
+    numPics = LongerVidCase(numVids, filenames,framesPerSec);
+else
+    % count the number of files in the frames directory: 
+    yourfolder = '/Users/Olive/Documents/MATLAB/seniorDesign/Shamrock-Senior-Design-Project/Data/frames';
+    numPics = dir([yourfolder '/*.png']);
+    numPics = length(numPics);
 end
 
 
@@ -92,7 +98,7 @@ params.landerFootprint = 10; %pixels (TODO convert to m?)
 
 %For computer vision
 params.boulderDetectorString = 'boulderDetector.mat';
-params.smallRockDetectorString = 'smallRockDetector.mat';
+params.smallRockDetectorString = 'SRDetector.mat';
 params.boulderDetectorThreshold = 30;
 params.smallRockDetectorThreshold = 65;
 
@@ -100,7 +106,7 @@ params.smallRockDetectorThreshold = 65;
 params.showHDAOutput = true;
 
 %% Image Processing
-imagProc = 1;
+imagProc = 0;
 if(imagProc == 1)
     cd Data;
     cd frames;
@@ -110,7 +116,7 @@ if(imagProc == 1)
     endMatName = '.mat';
 
     %Todo - loop over all pics (i = 1:numPics). currently only doing a few for faster runs
-    for i = 1:3
+    for i = 1:numPics
         namePic = [startName, num2str(i), endName];
 
         test_image = imread(namePic);
@@ -120,7 +126,7 @@ if(imagProc == 1)
 
         %Perform shadow detection
         shadow_hazard_map = shadowBasedDetectionWrapperAz(test_image, params, true);
-
+        
         %Perform computer vision
         cv_hazard_map = boulderDetectFunc(test_image, params);
 
@@ -146,6 +152,7 @@ end
 %% TRN Coordinate Mapping:
 dateOfRun = 16;
 runTRN = 0;
+framesPerSec = 5; 
 if(runTRN)
     cd TRN
 
@@ -175,14 +182,14 @@ else
     fileTRN = ['april',num2str(dateOfRun),'_trnOutput_',num2str(framesPerSec),'.mat'];
     
     data = load(fileTRN);
-    TRN_coords_scaled = data.coords_vec;
+    TRN_coords = data.coords_vec;
     cd ../../TRN
-    TRN_coords_scaled = outlierReject(TRN_coords_scaled)
+    TRN_coords = outlierReject(TRN_coords);
     
     
-    TRN_coords_scaled(:,1) = TRN_coords_scaled(:,1) + ((720/2)*scale_factor);
-    TRN_coords_scaled(:,2) = TRN_coords_scaled(:,2) + ((1280/2)*scale_factor);
-    TRN_coords_scaled(:,3) = TRN_coords_scaled(:,3);
+    TRN_coords_scaled(:,1) = TRN_coords(:,1) + ((720/2)*scale_factor);
+    TRN_coords_scaled(:,2) = TRN_coords(:,2) + ((1280/2)*scale_factor);
+    TRN_coords_scaled(:,3) = TRN_coords(:,3);
     cd ..
 
     % TODO : assert what to do if file not found! 
@@ -198,13 +205,12 @@ M = 720;
 N = 1280;
 [hazardMapLidar,xq,yq,vq] = lidarMain(M,N, TRN_coords_scaled, dateOfRun,glob_map, ...
     displayImagesLidar, startPos, endPos);
-hazardMapLidar = ones(size(hazardMapLidar)) - hazardMapLidar;
+% hazardMapLidar = ones(size(hazardMapLidar)) - hazardMapLidar;
 %  = lidarMain(m,n, TRN_coords, dateOfRun,glob_map)
- 
-cd ..
 
 % plot Lidar results:
 hazz = 1 - flip(hazardMapLidar,1);
+
 figure,
 subplot(2,1,1)
 imagesc(hazz)
@@ -229,7 +235,15 @@ xlabel('x pixels')
 %% Hazard Detection and Avoidance
 hazardMapLidar = hazz;
 [lidarX, lidarY] = size(hazardMapLidar);
-for j = 1:3
+lidarX = 720;
+lidarY = 1280;
+count = 0; 
+%finalHazard = zeros(720,1280);
+%finalHazard = zeros(820,1380);
+finalHazard = zeros(1000, 2000);
+
+
+for j = 1:77
     %load data
     shadow_hazard = load([startName, num2str(j), '_shadow', endMatName]);
     shadow_hazard_map = shadow_hazard.shadow_hazard_map;
@@ -237,7 +251,7 @@ for j = 1:3
     cv_hazard_map = cv_hazard.cv_hazard_map;
     
     %take frame of lidar map
-    this_coord = TRN_coords_scaled(j,1:2);
+    this_coord = TRN_coords(j,1:2);
     width_x = lidarX * scale_factor;
     width_y = lidarY * scale_factor;
     start_x = round(this_coord(1) - width_x / 2);
@@ -256,6 +270,19 @@ for j = 1:3
     if finish_y > lidarY
         finish_y = lidarY;
     end
+    if start_x > lidarX
+    start_x = 720; 
+    end
+    
+    cd Data
+    cd frames
+    
+    name = ['frame_',num2str(j),'.png'];
+    toShow = imread(name);
+    
+    cd ..
+    cd ..
+   
     this_frame = hazardMapLidar(start_x:finish_x, start_y:finish_y);
     lidar_hazard_map = imresize(this_frame, [180, 320]);
     %{
@@ -276,34 +303,60 @@ for j = 1:3
     ylabel('y pixels')
     xlabel('x pixels')
     %}
-    
     %Combine hazard maps w/ logical OR
     hazard_map = shadow_hazard_map | cv_hazard_map | lidar_hazard_map;
-
+    h = colorbar;
+    set(h, 'ylim', [0 1])
+    
     %display combination of hazard maps
-    figure
-    subplot(2,2,1)
-    imagesc(shadow_hazard_map)
-    colorbar
-    subplot(2,2,2)
-    imagesc(cv_hazard_map)
-    colorbar
-    subplot(2,2,3)
-    imagesc(lidar_hazard_map)
-    colorbar
-    subplot(2,2,4)
-    imagesc(hazard_map)
-    colorbar
+    if(1)
+        figure
+        subplot(3,3,1)
+        imagesc(shadow_hazard_map)
+        title('shadow based')
+        colorbar
+        subplot(3,3,2)
+        imagesc(cv_hazard_map)
+        title('CV')
+        colorbar
+        subplot(3,3,3)
+        imagesc(lidar_hazard_map)
+        title('lidar')
+        colorbar
+        subplot(3,3,4)
+        title('combined hazard map')
+        imagesc(hazard_map)
+        colorbar
+        subplot(3,3,5);
+        imagesc(toShow)
+        title('Subplot 5 and 6: Both')
+        
+        %Run HDA algorithm
+        HDAWrapper(hazard_map, params);
+    end
     
+    [hazardCurr, update] = make_final_hazard_map(shadow_hazard_map,cv_hazard_map,this_coord,lidar_hazard_map);
     
+    if(update)
+        count = count + 1;
+        finalHazard = finalHazard | hazardCurr;
+        
+        figure, 
+        imagesc(finalHazard)
+        colorbar
+    end
     
-    %Run HDA algorithm
-    HDAWrapper(hazard_map, params);
 end
+%%
+figure, 
+hold on
+imagesc(finalHazard)
+xlim([0 720])
+ylim([0 1280])
+hold off
+colorbar
 
 %% Format outputs
-
-
 
 
 

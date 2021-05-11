@@ -4,13 +4,8 @@
 function numPics = GetFrames_Video(filename, framesPerSec)
 % Load in movie file (TBD): 
 
-cd Data;
-cd movie_data
 
 v = VideoReader(filename);
-
-cd .. 
-cd frames
 
 filenameBeg = 'frame_';
 filenameEnd = '.png';
@@ -35,9 +30,5 @@ for i = 1:(duration*5)
         
 end
 numPics = i;
-
-% cd back to main:
-cd ..
-cd ..
 
 end

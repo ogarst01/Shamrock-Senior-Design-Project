@@ -1,4 +1,4 @@
-function numPics = LongerVidCase(numVids, framesPerSec)
+function numPics = LongerVidCase(numVids,filenames, framesPerSec)
 
 currNumPics = 0;
 
@@ -7,11 +7,11 @@ for i = 1:numVids
     cd Data;
     cd movie_data
     
-    movieNameBeg = 'april20_min';
-    movieNameEnd = '.mp4';
+    movieNameBeg = filenames(i);
+    %movieNameEnd = '.mp4';
     
-    movieFileCurr =[movieNameBeg,num2str(i),movieNameEnd];
-    
+    movieFileCurr =movieNameBeg
+    movieFileCurr = convertStringsToChars(movieFileCurr)
     v = VideoReader(movieFileCurr);
 
     cd .. 

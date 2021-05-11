@@ -11,8 +11,19 @@ function hazardMap = boulderDetectFunc(testImage, params)
 %            - boulderDetectorString: path/title of boulder detector to use
 %            - smallRockDetectorString: path/title of small rock detector to use
 
-load(params.boulderDetectorString)
-load(params.smallRockDetectorString)
+cd ..
+cd ..
+cd ComputerVision
+cd BoulderDetect
+%load(params.boulderDetectorString)
+load('boulderDetector.mat')
+%load(params.smallRockDetectorString)
+load('SRDetector.mat')
+
+cd ..
+cd ..
+cd Data
+cd frames 
 
 img_lab = rgb2lab(testImage);
 
